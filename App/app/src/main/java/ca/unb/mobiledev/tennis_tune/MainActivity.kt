@@ -71,12 +71,6 @@ class MainActivity : AppCompatActivity() {
         setupVisualizerFxAndUI()
         checkRecordAudioPermission()
 
-        mStatusTextView = TextView(this)
-        mLinearLayout = LinearLayout(this)
-        mLinearLayout!!.orientation = LinearLayout.VERTICAL
-        mLinearLayout!!.addView(mStatusTextView)
-        setContentView(mLinearLayout)
-        mStatusTextView!!.text = "Playing audio..."
         startAudioCapture()
     }
 
@@ -92,13 +86,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupVisualizerFxAndUI() {
-        // Create a VisualizerView (defined below), which will render the simplified audio
-        // wave form to a Canvas.
+        // Create a ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.VisualizerView
         mVisualizerView = VisualizerView(this)
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.FILL_PARENT,
             (this.VISUALIZER_HEIGHT_DIP * resources.displayMetrics.density).toInt()
         )
+        // Get the LinearLayout container and add the ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.VisualizerView to it
+        mLinearLayout = findViewById(R.id.my_visualizer_container)
         mLinearLayout?.addView(mVisualizerView)
     }
 
@@ -115,18 +110,17 @@ class MainActivity : AppCompatActivity() {
         val sampleRateInHz = 44100
         val channelConfig = AudioFormat.CHANNEL_IN_MONO
         val audioFormat = AudioFormat.ENCODING_PCM_8BIT
-        val bufferSizeInBytes = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
-        val audioRecord = AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
+        val bufferSizeInBytes =
+            AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+        val audioRecord =
+            AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
         val buffer = ByteArray(bufferSizeInBytes)
         val scope = CoroutineScope(Dispatchers.IO + job)
 
         scope.launch {
-            // Do something with the recorded audio data
             audioRecord.startRecording()
             while (isActive) {
                 val readSize = audioRecord.read(buffer, 0, buffer.size, AudioRecord.READ_BLOCKING)
-
-                System.out.println(buffer.contentToString())
                 mVisualizerView?.updateVisualizer(buffer.sliceArray(0 until readSize))
             }
             audioRecord.stop()
