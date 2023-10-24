@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
-import kotlin.math.absoluteValue
 
 class VisualizerView : View {
     private val paint = Paint()
@@ -27,8 +26,16 @@ class VisualizerView : View {
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
 
-    var dominantFrequency: Float = 0f
-        private set
+    private var dominantFrequency: Float = 0f
+
+    private val recentFrequencies = mutableListOf<Float>()
+    private val maxRecentSize = 10 // Frequency averaging window size
+    private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
+    private var lastUpdateTime: Long = 0
+    private var lastFrequencyUpdateTime: Long = 0
+    private val frequencyUpdateInterval = 500 // 500ms, adjust as needed
+    private var recentDisplayFrequencies = mutableListOf<Float>()
+    private val maxDisplayRecentSize = 10  // Adjust as needed
 
     interface OnDominantFrequencyChangedListener {
         fun onDominantFrequencyChanged(frequency: Float)
@@ -50,42 +57,29 @@ class VisualizerView : View {
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
+        val currentTime = System.currentTimeMillis()
         amplitudes = newAmplitudes
         computeFFT(amplitudes)
         // Find the index with the maximum amplitude after FFT
-        val maxIndex =
-            amplitudes.indices.maxByOrNull { (amplitudes[it].toInt() and 0xFF).absoluteValue } ?: -1
+        val maxIndex = magnitudes.indices.maxByOrNull { magnitudes[it] } ?: -1
         if (maxIndex != -1) {
-            // Convert index to frequency: frequency = index * sampleRate / FFT_Size
-            // NOTE: You might need to adjust this based on your specific FFT implementation details
-            maxFrequency =
-                (maxIndex * sampleRate / (2 * amplitudes.size)).toFloat() // The '2' assumes the FFT size is twice the amplitude array size
-            // Inside the updateVisualizer method, after setting the maxFrequency
-            dominantFrequency = maxFrequency
-            dominantFrequencyListener?.onDominantFrequencyChanged(maxFrequency)
-            Log.d("VisualizerView", "Dominant Frequency: $maxFrequency")
+            if (currentTime - lastFrequencyUpdateTime > frequencyUpdateInterval) {
+                maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+                dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
+                dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
+                Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
+                lastFrequencyUpdateTime = currentTime
+            }
         }
 
-        invalidate()  // Request a redraw
-
-        // Schedule the reset after your desired interval (e.g., 5 seconds)
+        if (currentTime - lastUpdateTime > 50) {
+            invalidate()  // Request a redraw
+            lastUpdateTime = currentTime
+        }
+        
+        // Schedule the reset after your desired interval (e.g., 30 seconds)
         handler.removeCallbacks(resetFrequencyRunnable)
-        handler.postDelayed(resetFrequencyRunnable, 10000)
-    }
-
-    private fun computeFFT(amplitudes: ByteArray) {
-        // Convert byte array to float array
-        val floatData = FloatArray(1024) { i -> amplitudes.getOrElse(i) { 0 }.toFloat() }
-
-        // Apply FFT
-        fft.realForward(floatData)
-
-        // Compute magnitude for each frequency bin
-        for (i in magnitudes.indices) {
-            val real = floatData[2 * i]
-            val imaginary = floatData[2 * i + 1]
-            magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
-        }
+        handler.postDelayed(resetFrequencyRunnable, 30000)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -98,7 +92,11 @@ class VisualizerView : View {
             val barWidth = width / numberOfBars.toFloat()
             val scale = 0.5f // Adjust this value to control the vertical scale
 
+            val alpha = 0.1f  // Change this value to control the speed of interpolation
+
             for (i in 0 until numberOfBars) {
+                magnitudes[i] = alpha * magnitudes[i] + (1 - alpha) * prevMagnitudes[i]
+
                 val index = i * step
                 val magnitude = magnitudes[index]
                 val x = i * barWidth
@@ -111,7 +109,56 @@ class VisualizerView : View {
                     heightMagnitude,
                     paint
                 ) // Drawing from top to magnitude height
+
             }
+            prevMagnitudes = magnitudes.copyOf()
+
+        }
+    }
+
+    private fun hammingWindow(data: FloatArray): FloatArray {
+        val N = data.size
+        for (i in 0 until N) {
+            data[i] *= (0.54 - 0.46 * Math.cos(2 * Math.PI * i / (N - 1))).toFloat()
+        }
+        return data
+    }
+
+    private fun computeFFT(amplitudes: ByteArray) {
+        // Convert byte array to float array
+        val floatData = FloatArray(1024) { i -> amplitudes.getOrElse(i) { 0 }.toFloat() }
+
+        // Apply the Hamming window
+        hammingWindow(floatData)
+
+        // Apply FFT
+        fft.realForward(floatData)
+
+        // Compute magnitude for each frequency bin
+        for (i in magnitudes.indices) {
+            val real = floatData[2 * i]
+            val imaginary = floatData[2 * i + 1]
+            magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
+        }
+    }
+
+    private fun addAndComputeAverageFrequency(frequency: Float): Float {
+        synchronized(recentFrequencies) {
+            if (recentFrequencies.size >= maxRecentSize) {
+                recentFrequencies.removeAt(0)
+            }
+            recentFrequencies.add(frequency)
+            return recentFrequencies.average().toFloat()
+        }
+    }
+
+    private fun computeDisplayAverageFrequency(frequency: Float): Float {
+        synchronized(recentDisplayFrequencies) {
+            if (recentDisplayFrequencies.size >= maxDisplayRecentSize) {
+                recentDisplayFrequencies.removeAt(0)
+            }
+            recentDisplayFrequencies.add(frequency)
+            return recentDisplayFrequencies.average().toFloat()
         }
     }
 

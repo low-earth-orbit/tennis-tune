@@ -168,9 +168,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
 
     override fun onDominantFrequencyChanged(frequency: Float) {
         Log.d("MainActivity", "Received Dominant Frequency: $frequency")
-        val kHz = (frequency / 1000).toInt()
         runOnUiThread {
-            frequencyTextView?.text = "Frequency: ${kHz} kHz"
+            frequencyTextView?.text = "Frequency: ${frequency}"
         }
     }
 
