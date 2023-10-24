@@ -2,6 +2,7 @@ package ca.unb.mobiledev.tennis_tune
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
@@ -40,7 +41,7 @@ class VisualizerView : View {
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
         amplitudes = newAmplitudes
-
+        computeFFT(amplitudes)
         // Find the index with the maximum amplitude after FFT
         val maxIndex =
             amplitudes.indices.maxByOrNull { (amplitudes[it].toInt() and 0xFF).absoluteValue } ?: -1
@@ -76,12 +77,13 @@ class VisualizerView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        canvas.drawColor(Color.BLACK) // Set the background color to black
 
         if (isAudioInputAvailable && magnitudes.isNotEmpty()) {
             val numberOfBars = 32 // for example, which is a fraction of the original 512
             val step = magnitudes.size / numberOfBars
             val barWidth = width / numberOfBars.toFloat()
-            val scale = 0.5f // Adjust this value to control the vertical scale
+            val scale = 0.1f // Adjust this value to control the vertical scale
 
             for (i in 0 until numberOfBars) {
                 val index = i * step
@@ -97,10 +99,14 @@ class VisualizerView : View {
                     paint
                 ) // Drawing from top to magnitude height
             }
-//            paint.textSize = 40f // Adjust text size as needed
-//            canvas.drawText("Max Frequency: ${maxFrequency / 1000} kHz", 10f, 50f, paint)
+//            paint.color = Color.LTGRAY
+//            paint.textSize = 40f
+            // Adjust the Y-coordinate to place text at a position that is above the tallest bar
+//            val textYPosition = 30f  // You can adjust this value as needed
+//            canvas.drawText("Max Frequency: ${maxFrequency / 1000} kHz", 10f, textYPosition, paint)
         }
     }
+
 
     fun setAudioInputAvailable(isAvailable: Boolean) {
         isAudioInputAvailable = isAvailable
