@@ -33,7 +33,7 @@ class VisualizerView : View {
     private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
     private var lastUpdateTime: Long = 0
     private var lastFrequencyUpdateTime: Long = 0
-    private val frequencyUpdateInterval = 500 // 500ms, adjust as needed
+    private val frequencyUpdateInterval = 50 // 500ms, adjust as needed
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize = 10  // Adjust as needed
 
@@ -58,6 +58,7 @@ class VisualizerView : View {
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
         val currentTime = System.currentTimeMillis()
+
         amplitudes = newAmplitudes
         computeFFT(amplitudes)
         // Find the index with the maximum amplitude after FFT
@@ -65,10 +66,13 @@ class VisualizerView : View {
         if (maxIndex != -1) {
             if (currentTime - lastFrequencyUpdateTime > frequencyUpdateInterval) {
                 maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
-                dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
-                dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
-                Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
-                lastFrequencyUpdateTime = currentTime
+
+                if (maxFrequency >= 420f && maxFrequency <= 770f) {
+                    dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
+                    dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
+                    Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
+                    lastFrequencyUpdateTime = currentTime
+                }
             }
         }
 
@@ -76,10 +80,10 @@ class VisualizerView : View {
             invalidate()  // Request a redraw
             lastUpdateTime = currentTime
         }
-        
-        // Schedule the reset after your desired interval (e.g., 30 seconds)
+
+        // Schedule the reset after your desired interval (e.g., 1 seconds)
         handler.removeCallbacks(resetFrequencyRunnable)
-        handler.postDelayed(resetFrequencyRunnable, 30000)
+        handler.postDelayed(resetFrequencyRunnable, 1000)
     }
 
     override fun onDraw(canvas: Canvas) {
