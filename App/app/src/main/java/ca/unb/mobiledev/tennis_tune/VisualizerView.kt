@@ -81,7 +81,7 @@ class VisualizerView : View {
         fft.realForward(floatData)
 
         // Compute magnitude for each frequency bin
-        for (i in 0 until magnitudes.size) {
+        for (i in magnitudes.indices) {
             val real = floatData[2 * i]
             val imaginary = floatData[2 * i + 1]
             magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
@@ -96,7 +96,7 @@ class VisualizerView : View {
             val numberOfBars = 32 // for example, which is a fraction of the original 512
             val step = magnitudes.size / numberOfBars
             val barWidth = width / numberOfBars.toFloat()
-            val scale = 0.1f // Adjust this value to control the vertical scale
+            val scale = 0.5f // Adjust this value to control the vertical scale
 
             for (i in 0 until numberOfBars) {
                 val index = i * step
@@ -112,14 +112,8 @@ class VisualizerView : View {
                     paint
                 ) // Drawing from top to magnitude height
             }
-//            paint.color = Color.LTGRAY
-//            paint.textSize = 40f
-            // Adjust the Y-coordinate to place text at a position that is above the tallest bar
-//            val textYPosition = 30f  // You can adjust this value as needed
-//            canvas.drawText("Max Frequency: ${maxFrequency / 1000} kHz", 10f, textYPosition, paint)
         }
     }
-
 
     fun setAudioInputAvailable(isAvailable: Boolean) {
         isAudioInputAvailable = isAvailable

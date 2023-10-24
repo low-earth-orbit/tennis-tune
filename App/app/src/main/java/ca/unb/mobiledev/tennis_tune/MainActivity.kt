@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
     private var mLinearLayout: LinearLayout? = null
     private var mVisualizerView: VisualizerView? = null
     private var mStatusTextView: TextView? = null
+    private var frequencyTextView: TextView? = null
     private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mStatusTextView = findViewById(R.id.statusTextView)
+        frequencyTextView = findViewById(R.id.frequencyTextView)
 
 
         setSupportActionBar(binding.appBarMain.toolbar)
@@ -168,7 +170,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         Log.d("MainActivity", "Received Dominant Frequency: $frequency")
         val kHz = (frequency / 1000).toInt()
         runOnUiThread {
-            mStatusTextView?.text = "Dominant Frequency: ${kHz} kHz"
+            frequencyTextView?.text = "Frequency: ${kHz} kHz"
         }
     }
 
