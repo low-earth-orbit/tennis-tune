@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
 import kotlin.math.absoluteValue
@@ -25,6 +26,15 @@ class VisualizerView : View {
     }
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
+
+    var dominantFrequency: Float = 0f
+        private set
+
+    interface OnDominantFrequencyChangedListener {
+        fun onDominantFrequencyChanged(frequency: Float)
+    }
+
+    var dominantFrequencyListener: OnDominantFrequencyChangedListener? = null
 
     constructor(context: Context) : super(context) {
         init()
@@ -50,15 +60,18 @@ class VisualizerView : View {
             // NOTE: You might need to adjust this based on your specific FFT implementation details
             maxFrequency =
                 (maxIndex * sampleRate / (2 * amplitudes.size)).toFloat() // The '2' assumes the FFT size is twice the amplitude array size
+            // Inside the updateVisualizer method, after setting the maxFrequency
+            dominantFrequency = maxFrequency
+            dominantFrequencyListener?.onDominantFrequencyChanged(maxFrequency)
+            Log.d("VisualizerView", "Dominant Frequency: $maxFrequency")
         }
 
         invalidate()  // Request a redraw
 
         // Schedule the reset after your desired interval (e.g., 5 seconds)
-//        handler.removeCallbacks(resetFrequencyRunnable)
-//        handler.postDelayed(resetFrequencyRunnable, 10000)
+        handler.removeCallbacks(resetFrequencyRunnable)
+        handler.postDelayed(resetFrequencyRunnable, 10000)
     }
-
 
     private fun computeFFT(amplitudes: ByteArray) {
         // Convert byte array to float array

@@ -9,6 +9,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.media.audiofx.Visualizer
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -28,10 +29,9 @@ import androidx.navigation.ui.setupWithNavController
 import ca.unb.mobiledev.tennis_tune.databinding.ActivityMainBinding
 import ca.unb.mobiledev.tennis_tune.theme.ApiexplorationTheme
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChangedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -45,12 +45,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        mStatusTextView = findViewById(R.id.statusTextView)
+
 
         setSupportActionBar(binding.appBarMain.toolbar)
-        
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -65,6 +66,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         setupVisualizerFxAndUI()
+        mVisualizerView?.dominantFrequencyListener = this
+
+
         checkRecordAudioPermission()
 
         startAudioCapture()
@@ -82,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupVisualizerFxAndUI() {
-        // Create a ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.VisualizerView
         mVisualizerView = VisualizerView(this)
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.FILL_PARENT,
@@ -160,6 +163,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onDominantFrequencyChanged(frequency: Float) {
+        Log.d("MainActivity", "Received Dominant Frequency: $frequency")
+        runOnUiThread {
+            mStatusTextView?.text = "Dominant Frequency: ${(frequency / 1000).toInt()} kHz"
+        }
+    }
+
 }
 
 @Composable
