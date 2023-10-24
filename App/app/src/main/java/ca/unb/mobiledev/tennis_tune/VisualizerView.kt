@@ -27,15 +27,15 @@ class VisualizerView : View {
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
 
     private var dominantFrequency: Float = 0f
-
     private val recentFrequencies = mutableListOf<Float>()
     private val maxRecentSize = 10 // Frequency averaging window size
     private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
     private var lastUpdateTime: Long = 0
     private var lastFrequencyUpdateTime: Long = 0
-    private val frequencyUpdateInterval = 50 // 500ms, adjust as needed
+    private val frequencyUpdateInterval = 50 // 50ms, adjust as needed
     private var recentDisplayFrequencies = mutableListOf<Float>()
-    private val maxDisplayRecentSize = 10  // Adjust as needed
+    private val maxDisplayRecentSize =
+        10  // Use a rolling average of the last 10 frequencies. Adjust as needed
 
     interface OnDominantFrequencyChangedListener {
         fun onDominantFrequencyChanged(frequency: Float)
@@ -75,11 +75,11 @@ class VisualizerView : View {
                 }
             }
         }
-
-        if (currentTime - lastUpdateTime > 50) {
-            invalidate()  // Request a redraw
-            lastUpdateTime = currentTime
-        }
+//
+//        if (currentTime - lastUpdateTime > 50) {
+        invalidate()  // Request a redraw
+        lastUpdateTime = currentTime
+//        }
 
         // Schedule the reset after your desired interval (e.g., 1 seconds)
         handler.removeCallbacks(resetFrequencyRunnable)
