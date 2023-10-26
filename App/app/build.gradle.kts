@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ca.unb.mobiledev.tennis_tune"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ca.unb.mobiledev.tennis_tune"
@@ -48,7 +48,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
+    implementation("androidx.compose.ui:ui-graphics-android:1.5.4")
+    implementation("androidx.compose.ui:ui-text-android:1.5.4")
+    implementation("androidx.compose.foundation:foundation-android:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling-preview-android:1.5.4")
+    implementation("androidx.compose.material:material:1.4.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation("com.github.wendykierp:JTransforms:3.1")
 }
