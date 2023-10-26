@@ -16,9 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -27,7 +24,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ca.unb.mobiledev.tennis_tune.databinding.ActivityMainBinding
-import ca.unb.mobiledev.tennis_tune.theme.ApiexplorationTheme
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.*
 
@@ -90,10 +86,9 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
     private fun setupVisualizerFxAndUI() {
         mVisualizerView = VisualizerView(this)
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.FILL_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT,
             (this.VISUALIZER_HEIGHT_DIP * resources.displayMetrics.density).toInt()
         )
-        // Get the LinearLayout container and add the ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.ca.unb.mobiledev.tennis_tune.VisualizerView to it
         mLinearLayout = findViewById(R.id.my_visualizer_container)
         mLinearLayout?.addView(mVisualizerView)
     }
@@ -173,17 +168,4 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         }
     }
 
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ApiexplorationTheme {
-        Greeting("Android")
-    }
 }
