@@ -70,10 +70,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         setupVisualizerFxAndUI()
         mVisualizerView?.dominantFrequencyListener = this
 
-
         checkRecordAudioPermission()
-
-        startAudioCapture()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -137,7 +134,21 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
                 Manifest.permission.RECORD_AUDIO
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Permission has not been granted yet, request it from the user
+            // If permission was denied previously and the user checked "Don't ask again"
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.RECORD_AUDIO
+                )
+            ) {
+                // Show an explanation to the user
+                Toast.makeText(
+                    this,
+                    "We need audio permission for string tension measurement",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            // Request the permission
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.RECORD_AUDIO),
@@ -146,23 +157,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         } else {
             // Permission has already been granted, proceed with audio capture
             startAudioCapture()
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == MY_PERMISSIONS_RECORD_AUDIO) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted, proceed with audio capture
-                startAudioCapture()
-            } else {
-                // Permission has been denied, show a message to the user or handle the error
-                Toast.makeText(this, "Audio capture permission denied", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
