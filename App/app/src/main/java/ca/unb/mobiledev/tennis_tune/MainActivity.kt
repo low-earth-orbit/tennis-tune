@@ -168,11 +168,28 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
 
     override fun onDominantFrequencyChanged(frequency: Float) {
         Log.d("MainActivity", "Received Dominant Frequency: $frequency")
+
+        val massDensity = 0.0015
+        val headSize = 0.0645
+
+        val tension = frequencyToTension(frequency, headSize, massDensity)
+
         runOnUiThread {
-            frequencyTextView?.text = "Frequency: ${frequency}"
+            frequencyTextView?.text = buildString {
+                append(
+                    "Frequency: ${"%.0f".format(frequency)} Hz\nTension: ${
+                        "%.1f"
+                            .format(tension)
+                    } lb"
+                )
+            }
         }
     }
 
+    private fun frequencyToTension(frequency: Float, headSize: Double, density: Double): Double {
+        val tensionNewton = frequency * frequency * 4 * headSize * density
+        return tensionNewton / 4.44822 + 17 // Convert tension from Newton to lb
+    }
 }
 
 @Composable
