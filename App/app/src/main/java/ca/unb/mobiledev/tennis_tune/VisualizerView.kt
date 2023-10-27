@@ -29,7 +29,10 @@ class VisualizerView : View {
     private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize =
-        10  // Use a rolling average of the last 10 frequencies. Adjust as needed
+        30  // Use a rolling window of the last 30 frequencies. Adjust as needed
+
+    private var recentMagnitudesAverage = mutableListOf<Float>()
+    private val maxMagnitudeAverageSize = 20  // Using 20 as an example, adjust as needed
 
     interface OnDominantFrequencyChangedListener {
         fun onDominantFrequencyChanged(frequency: Float)
@@ -53,16 +56,36 @@ class VisualizerView : View {
     fun updateVisualizer(newAmplitudes: ByteArray) {
         amplitudes = newAmplitudes
         computeFFT(amplitudes)
-        // Find the index with the maximum amplitude after FFT
-        val maxIndex = magnitudes.indices.maxByOrNull { magnitudes[it] } ?: -1
+
+        // Apply a thresholding method to filter out background noise
+        // Compute the rolling average of magnitudes
+        val averageMagnitude = magnitudes.average().toFloat()
+        synchronized(recentMagnitudesAverage) {
+            if (recentMagnitudesAverage.size >= maxMagnitudeAverageSize) {
+                recentMagnitudesAverage.removeAt(0)
+            }
+            recentMagnitudesAverage.add(averageMagnitude)
+        }
+        val noiseThreshold = recentMagnitudesAverage.average()
+            .toFloat() * 1.5  // Using 1.5 as a multiplier, adjust as needed
+
+        // Find the index with the maximum amplitude after FFT that's above the noise threshold
+        val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
+            .maxByOrNull { magnitudes[it] } ?: -1
+
         if (maxIndex != -1) {
             maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+
+            // Apply a frequency range to filter out background noise
             if (maxFrequency in 420f..770f) {
-                dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
+                // Use median frequency measured to enhance the reliability of measurement
+                // Median is less sensitive to outliers than mean
+                dominantFrequency = computeDisplayMedianFrequency(maxFrequency)
                 dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
                 Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
             }
         }
+
         invalidate()  // Request a redraw
         // Schedule the reset after desired interval (e.g., 1 second)
         handler.removeCallbacks(resetFrequencyRunnable)
@@ -129,13 +152,13 @@ class VisualizerView : View {
         }
     }
 
-    private fun computeDisplayAverageFrequency(frequency: Float): Float {
+    private fun computeDisplayMedianFrequency(frequency: Float): Float {
         synchronized(recentDisplayFrequencies) {
             if (recentDisplayFrequencies.size >= maxDisplayRecentSize) {
                 recentDisplayFrequencies.removeAt(0)
             }
             recentDisplayFrequencies.add(frequency)
-            return recentDisplayFrequencies.average().toFloat()
+            return recentDisplayFrequencies.sorted()[recentDisplayFrequencies.size / 2]
         }
     }
 
