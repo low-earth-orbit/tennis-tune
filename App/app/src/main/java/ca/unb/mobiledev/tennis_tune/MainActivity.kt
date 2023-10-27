@@ -26,6 +26,7 @@ import androidx.navigation.ui.setupWithNavController
 import ca.unb.mobiledev.tennis_tune.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.*
+import kotlin.math.pow
 
 class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChangedListener {
 
@@ -158,10 +159,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
     override fun onDominantFrequencyChanged(frequency: Float) {
         Log.d("MainActivity", "Received Dominant Frequency: $frequency")
 
-        val massDensity = 0.0015
-        val headSize = 0.0645
+        val stringMassDensity = 0.0015
+        val racquetHeadSize = 0.0645
 
-        val tension = frequencyToTension(frequency, headSize, massDensity)
+        val tension = frequencyToTension(frequency, racquetHeadSize, stringMassDensity)
 
         runOnUiThread {
             frequencyTextView?.text = buildString {
@@ -175,8 +176,21 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         }
     }
 
-    private fun frequencyToTension(frequency: Float, headSize: Double, density: Double): Double {
-        val tensionNewton = frequency * frequency * 4 * headSize * density
-        return tensionNewton / 4.44822 + 17 // Convert tension from Newton to lb
+    private fun frequencyToTension(
+        frequency: Float,
+        racquetHeadSize: Double,
+        stringMassDensity: Double
+    ): Double {
+        val toSingleStringFreqFactor = 1.0121457 // conversion factor from elliptical membrane
+        // to single string tension
+        val toMachineTensionFactor = 1.470588235 // machine
+        // tension is the pull tension; actual tension is about 32% lower than machine tension,
+        // immediately after
+        // strung; despite the fact, to avoid confusion, the displayed tension in the app is to
+        // approximate the machine tension, thus requiring this conversion factor
+        val newtonToLbFactor = 0.2248089431
+        val tensionNewton = 4 * racquetHeadSize * stringMassDensity * (frequency *
+                toSingleStringFreqFactor).pow(2)
+        return tensionNewton * toMachineTensionFactor * newtonToLbFactor
     }
 }
