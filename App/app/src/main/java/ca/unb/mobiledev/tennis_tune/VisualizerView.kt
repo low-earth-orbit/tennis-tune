@@ -25,14 +25,8 @@ class VisualizerView : View {
     }
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
-
     private var dominantFrequency: Float = 0f
-    private val recentFrequencies = mutableListOf<Float>()
-    private val maxRecentSize = 10 // Frequency averaging window size
     private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
-    private var lastUpdateTime: Long = 0
-    private var lastFrequencyUpdateTime: Long = 0
-    private val frequencyUpdateInterval = 50 // 50ms, adjust as needed
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize =
         10  // Use a rolling average of the last 10 frequencies. Adjust as needed
@@ -57,31 +51,20 @@ class VisualizerView : View {
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
-        val currentTime = System.currentTimeMillis()
-
         amplitudes = newAmplitudes
         computeFFT(amplitudes)
         // Find the index with the maximum amplitude after FFT
         val maxIndex = magnitudes.indices.maxByOrNull { magnitudes[it] } ?: -1
         if (maxIndex != -1) {
-            if (currentTime - lastFrequencyUpdateTime > frequencyUpdateInterval) {
-                maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
-
-                if (maxFrequency >= 420f && maxFrequency <= 770f) {
-                    dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
-                    dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
-                    Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
-                    lastFrequencyUpdateTime = currentTime
-                }
+            maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+            if (maxFrequency in 420f..770f) {
+                dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
+                dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
+                Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
             }
         }
-//
-//        if (currentTime - lastUpdateTime > 50) {
         invalidate()  // Request a redraw
-        lastUpdateTime = currentTime
-//        }
-
-        // Schedule the reset after your desired interval (e.g., 1 seconds)
+        // Schedule the reset after desired interval (e.g., 1 second)
         handler.removeCallbacks(resetFrequencyRunnable)
         handler.postDelayed(resetFrequencyRunnable, 1000)
     }
@@ -143,16 +126,6 @@ class VisualizerView : View {
             val real = floatData[2 * i]
             val imaginary = floatData[2 * i + 1]
             magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
-        }
-    }
-
-    private fun addAndComputeAverageFrequency(frequency: Float): Float {
-        synchronized(recentFrequencies) {
-            if (recentFrequencies.size >= maxRecentSize) {
-                recentFrequencies.removeAt(0)
-            }
-            recentFrequencies.add(frequency)
-            return recentFrequencies.average().toFloat()
         }
     }
 
