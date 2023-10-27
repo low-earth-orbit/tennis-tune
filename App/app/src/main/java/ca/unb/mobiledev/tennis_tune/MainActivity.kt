@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
     private var mStatusTextView: TextView? = null
     private var frequencyTextView: TextView? = null
     private val job = Job()
+    private lateinit var resetButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +70,11 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         mVisualizerView?.dominantFrequencyListener = this
 
         checkRecordAudioPermission()
+
+        resetButton = findViewById(R.id.resetButton)
+        resetButton.setOnClickListener {
+            mVisualizerView?.resetFrequencies()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
