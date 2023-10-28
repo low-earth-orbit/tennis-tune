@@ -10,19 +10,21 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
-import kotlin.math.abs
 
 class VisualizerView : View {
     private val paint = Paint()
     private var amplitudes: ByteArray = ByteArray(0)
     private var isAudioInputAvailable = false
-    private val fftSize = 1344
+
+    private val fftSize = 16384
     private val fftSizeHalf = fftSize / 2
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
     private var magnitudes = FloatArray(fftSizeHalf)
-
+    private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var maxFrequency: Float = 0f
+    private var accumulatedAmplitudes = ByteArray(0)
+
     private val handler = Handler(Looper.getMainLooper())
     private val resetFrequencyRunnable = Runnable {
         maxFrequency = 0f
@@ -31,13 +33,13 @@ class VisualizerView : View {
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
     private var dominantFrequency: Float = 0f
-    private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize =
-        30  // Use a rolling window of the last 30 frequencies. Adjust as needed
+        30  // Use a rolling window of the last 30 frequencies
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
-    private val maxMagnitudeAverageSize = 20  // Using 20 as an example, adjust as needed
+    private val maxMagnitudeAverageSize = 20  // Using 20 magnitudes for calculating background
+    // noise
 
     interface OnDominantFrequencyChangedListener {
         fun onDominantFrequencyChanged(frequency: Float)
@@ -59,8 +61,23 @@ class VisualizerView : View {
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
-        amplitudes = newAmplitudes
-        computeFFT(amplitudes)
+        // Step 1: Accumulate samples until we have enough for an FFT
+        accumulatedAmplitudes += newAmplitudes
+
+        if (accumulatedAmplitudes.size < fftSize) {
+            return // Not enough samples yet
+        }
+
+        // Assuming a 50% overlap for simplicity. Adjust as needed.
+        val combinedSize = fftSize
+        val combinedAmplitudes = accumulatedAmplitudes.sliceArray(0 until combinedSize)
+
+        // Store the half of the current amplitudes for use in the next call
+        accumulatedAmplitudes =
+            accumulatedAmplitudes.sliceArray(newAmplitudes.size until accumulatedAmplitudes.size)
+
+        computeFFT(combinedAmplitudes)
+
 //        Log.d("VisualizerView", "Incoming audio data size: ${newAmplitudes.size}")
         // Apply a thresholding method to filter out background noise
         // Compute the rolling average of magnitudes
@@ -73,7 +90,7 @@ class VisualizerView : View {
         }
 
         val noiseThreshold = recentMagnitudesAverage.average()
-            .toFloat() * 2.0  // Using 1 as a multiplier, adjust as needed
+            .toFloat() * 2.0  // Using 2 as a multiplier, adjust as needed
 //        Log.d("VisualizerView", "noiseThreshold: $noiseThreshold")
 
         // Find the index with the maximum amplitude after FFT that's above the noise threshold
@@ -95,6 +112,7 @@ class VisualizerView : View {
         }
 
         invalidate()  // Request a redraw
+
         // Schedule the reset after desired interval (e.g., 1 second)
         handler.removeCallbacks(resetFrequencyRunnable)
         handler.postDelayed(resetFrequencyRunnable, 1000)
@@ -146,9 +164,6 @@ class VisualizerView : View {
         // Convert byte array to float array
         floatData = FloatArray(fftSize) { i -> amplitudes.getOrElse(i) { 0 }.toFloat() }
 
-        // Autocorrelation-based filtering
-        filterBasedOnAutocorrelation(floatData)
-
         // Apply the Hamming window
         hammingWindow(floatData)
 
@@ -179,60 +194,6 @@ class VisualizerView : View {
             amplitudes = ByteArray(0)
         }
         invalidate()
-    }
-
-    private fun autocorrelation(data: FloatArray): FloatArray {
-        val result = FloatArray(data.size)
-        for (lag in data.indices) {
-            var sum = 0.0f
-            for (i in 0 until data.size - lag) {
-                sum += data[i] * data[i + lag]
-            }
-            result[lag] = sum
-        }
-        return result
-    }
-
-    private fun findPeaks(data: FloatArray): List<Int> {
-        val peaks = mutableListOf<Int>()
-        for (i in 1 until data.size - 1) {
-            if (data[i] > data[i - 1] && data[i] > data[i + 1]) {
-                peaks.add(i)
-            }
-        }
-        return peaks
-    }
-
-    private fun filterBasedOnAutocorrelation(amplitudes: FloatArray): FloatArray {
-        val autoCorr = autocorrelation(amplitudes)
-        val peaks = findPeaks(autoCorr)
-
-        val percentile = 95f
-        val peakThreshold = computePercentileThreshold(autoCorr, percentile)
-
-        for (i in amplitudes.indices) {
-            if (peaks.any { peak -> abs(peak - i) < 5 && autoCorr[peak] > peakThreshold }) {
-                // Keep the amplitude as it is if it's close to a peak and the peak is above threshold
-            } else {
-                amplitudes[i] = 0f
-            }
-        }
-        return amplitudes
-    }
-
-    fun computePercentileThreshold(data: FloatArray, percentile: Float): Float {
-        // Ensure the input percentile is between 0 and 100.
-        if (percentile <= 0f || percentile >= 100f) {
-            throw IllegalArgumentException("Percentile must be between 0 and 100")
-        }
-
-        // Sort the data.
-        val sortedData = data.sorted()
-
-        // Compute the index position for the desired percentile.
-        val index = (percentile / 100 * (sortedData.size - 1)).toInt()
-
-        return sortedData[index]
     }
 
     fun resetFrequencies() {
