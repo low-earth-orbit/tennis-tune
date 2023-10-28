@@ -35,10 +35,10 @@ class VisualizerView : View {
     private var dominantFrequency: Float = 0f
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize =
-        30  // Use a rolling window of the last 30 frequencies
+        60  // Use a rolling window of frequencies
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
-    private val maxMagnitudeAverageSize = 20  // Using 20 magnitudes for calculating background
+    private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
     // noise
 
     interface OnDominantFrequencyChangedListener {
