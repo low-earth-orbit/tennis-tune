@@ -15,9 +15,16 @@ class VisualizerView : View {
     private val paint = Paint()
     private var amplitudes: ByteArray = ByteArray(0)
     private var isAudioInputAvailable = false
-    private var fft = FloatFFT_1D(1024) // Assuming 1024 samples
-    private var magnitudes = FloatArray(512) // Magnitudes (after FFT)
+
+    private val fftSize = 16384
+    private val fftSizeHalf = fftSize / 2
+    private var floatData = FloatArray(fftSize)
+    private var fft = FloatFFT_1D(fftSize.toLong())
+    private var magnitudes = FloatArray(fftSizeHalf)
+    private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var maxFrequency: Float = 0f
+    private var accumulatedAmplitudes = ByteArray(0)
+
     private val handler = Handler(Looper.getMainLooper())
     private val resetFrequencyRunnable = Runnable {
         maxFrequency = 0f
@@ -25,17 +32,14 @@ class VisualizerView : View {
     }
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
-
     private var dominantFrequency: Float = 0f
-    private val recentFrequencies = mutableListOf<Float>()
-    private val maxRecentSize = 10 // Frequency averaging window size
-    private var prevMagnitudes = FloatArray(512) // Holds the previous frame's magnitudes
-    private var lastUpdateTime: Long = 0
-    private var lastFrequencyUpdateTime: Long = 0
-    private val frequencyUpdateInterval = 50 // 50ms, adjust as needed
     private var recentDisplayFrequencies = mutableListOf<Float>()
     private val maxDisplayRecentSize =
-        10  // Use a rolling average of the last 10 frequencies. Adjust as needed
+        60  // Use a rolling window of frequencies
+
+    private var recentMagnitudesAverage = mutableListOf<Float>()
+    private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
+    // noise
 
     interface OnDominantFrequencyChangedListener {
         fun onDominantFrequencyChanged(frequency: Float)
@@ -57,31 +61,59 @@ class VisualizerView : View {
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
-        val currentTime = System.currentTimeMillis()
+        // Step 1: Accumulate samples until we have enough for an FFT
+        accumulatedAmplitudes += newAmplitudes
 
-        amplitudes = newAmplitudes
-        computeFFT(amplitudes)
-        // Find the index with the maximum amplitude after FFT
-        val maxIndex = magnitudes.indices.maxByOrNull { magnitudes[it] } ?: -1
+        if (accumulatedAmplitudes.size < fftSize) {
+            return // Not enough samples yet
+        }
+
+        // Assuming a 50% overlap for simplicity. Adjust as needed.
+        val combinedSize = fftSize
+        val combinedAmplitudes = accumulatedAmplitudes.sliceArray(0 until combinedSize)
+
+        // Store the half of the current amplitudes for use in the next call
+        accumulatedAmplitudes =
+            accumulatedAmplitudes.sliceArray(newAmplitudes.size until accumulatedAmplitudes.size)
+
+        computeFFT(combinedAmplitudes)
+
+//        Log.d("VisualizerView", "Incoming audio data size: ${newAmplitudes.size}")
+        // Apply a thresholding method to filter out background noise
+        // Compute the rolling average of magnitudes
+        val averageMagnitude = magnitudes.average().toFloat()
+        synchronized(recentMagnitudesAverage) {
+            if (recentMagnitudesAverage.size >= maxMagnitudeAverageSize) {
+                recentMagnitudesAverage.removeAt(0)
+            }
+            recentMagnitudesAverage.add(averageMagnitude)
+        }
+
+        val noiseThreshold = recentMagnitudesAverage.average()
+            .toFloat() * 2.0  // Using 2 as a multiplier, adjust as needed
+//        Log.d("VisualizerView", "noiseThreshold: $noiseThreshold")
+
+        // Find the index with the maximum amplitude after FFT that's above the noise threshold
+        val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
+            .maxByOrNull { magnitudes[it] } ?: -1
+
         if (maxIndex != -1) {
-            if (currentTime - lastFrequencyUpdateTime > frequencyUpdateInterval) {
-                maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+            maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+//            Log.d("VisualizerView", "maxFrequency: $maxFrequency")
 
-                if (maxFrequency >= 420f && maxFrequency <= 770f) {
-                    dominantFrequency = computeDisplayAverageFrequency(maxFrequency)
-                    dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
-                    Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
-                    lastFrequencyUpdateTime = currentTime
-                }
+            // Apply a frequency range to filter out background noise
+            if (maxFrequency in 420f..770f) {
+                // Use median frequency measured to enhance the reliability of measurement
+                // Median is less sensitive to outliers than mean
+                dominantFrequency = computeDisplayMedianFrequency(maxFrequency)
+                dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
+                Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
             }
         }
-//
-//        if (currentTime - lastUpdateTime > 50) {
-        invalidate()  // Request a redraw
-        lastUpdateTime = currentTime
-//        }
 
-        // Schedule the reset after your desired interval (e.g., 1 seconds)
+        invalidate()  // Request a redraw
+
+        // Schedule the reset after desired interval (e.g., 1 second)
         handler.removeCallbacks(resetFrequencyRunnable)
         handler.postDelayed(resetFrequencyRunnable, 1000)
     }
@@ -91,7 +123,7 @@ class VisualizerView : View {
         canvas.drawColor(Color.BLACK) // Set the background color to black
 
         if (isAudioInputAvailable && magnitudes.isNotEmpty()) {
-            val numberOfBars = 32 // for example, which is a fraction of the original 512
+            val numberOfBars = 32
             val step = magnitudes.size / numberOfBars
             val barWidth = width / numberOfBars.toFloat()
             val scale = 0.5f // Adjust this value to control the vertical scale
@@ -130,7 +162,7 @@ class VisualizerView : View {
 
     private fun computeFFT(amplitudes: ByteArray) {
         // Convert byte array to float array
-        val floatData = FloatArray(1024) { i -> amplitudes.getOrElse(i) { 0 }.toFloat() }
+        floatData = FloatArray(fftSize) { i -> amplitudes.getOrElse(i) { 0 }.toFloat() }
 
         // Apply the Hamming window
         hammingWindow(floatData)
@@ -146,23 +178,13 @@ class VisualizerView : View {
         }
     }
 
-    private fun addAndComputeAverageFrequency(frequency: Float): Float {
-        synchronized(recentFrequencies) {
-            if (recentFrequencies.size >= maxRecentSize) {
-                recentFrequencies.removeAt(0)
-            }
-            recentFrequencies.add(frequency)
-            return recentFrequencies.average().toFloat()
-        }
-    }
-
-    private fun computeDisplayAverageFrequency(frequency: Float): Float {
+    private fun computeDisplayMedianFrequency(frequency: Float): Float {
         synchronized(recentDisplayFrequencies) {
             if (recentDisplayFrequencies.size >= maxDisplayRecentSize) {
                 recentDisplayFrequencies.removeAt(0)
             }
             recentDisplayFrequencies.add(frequency)
-            return recentDisplayFrequencies.average().toFloat()
+            return recentDisplayFrequencies.sorted()[recentDisplayFrequencies.size / 2]
         }
     }
 
@@ -172,5 +194,14 @@ class VisualizerView : View {
             amplitudes = ByteArray(0)
         }
         invalidate()
+    }
+
+    fun resetFrequencies() {
+        amplitudes = ByteArray(0)
+        recentDisplayFrequencies.clear()
+        recentMagnitudesAverage.clear()
+        dominantFrequency = 0f
+        maxFrequency = 0f
+        invalidate()  // Request a redraw
     }
 }
