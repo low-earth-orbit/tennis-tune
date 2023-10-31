@@ -29,7 +29,7 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.*
 import kotlin.math.pow
 
-class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChangedListener {
+class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChangeListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         setContentView(binding.root)
         mStatusTextView = findViewById(R.id.statusTextView)
         frequencyTextView = findViewById(R.id.frequencyTextView)
-
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
@@ -74,6 +73,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         resetButton = findViewById(R.id.resetButton)
         resetButton.setOnClickListener {
             mVisualizerView?.resetFrequencies()
+            frequencyTextView?.text = "Detecting ..."
         }
     }
 
@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         }
     }
 
-    override fun onDominantFrequencyChanged(frequency: Float) {
+    override fun onDominantFrequencyChange(frequency: Float) {
         Log.d("MainActivity", "Received Dominant Frequency: $frequency")
 
         val stringMassDensity = 0.0015

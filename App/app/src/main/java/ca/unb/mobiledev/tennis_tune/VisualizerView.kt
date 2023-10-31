@@ -7,13 +7,11 @@ import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
 
 class VisualizerView : View {
     private val paint = Paint()
-    private var amplitudes: ByteArray = ByteArray(0)
     private var isAudioInputAvailable = false
 
     private val fftSize = 16384
@@ -23,7 +21,7 @@ class VisualizerView : View {
     private var magnitudes = FloatArray(fftSizeHalf)
     private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var maxFrequency: Float = 0f
-    private var accumulatedAmplitudes = ByteArray(0)
+    private var amplitudes = ByteArray(0)
 
     private val handler = Handler(Looper.getMainLooper())
     private val resetFrequencyRunnable = Runnable {
@@ -41,11 +39,11 @@ class VisualizerView : View {
     private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
     // noise
 
-    interface OnDominantFrequencyChangedListener {
-        fun onDominantFrequencyChanged(frequency: Float)
+    interface OnDominantFrequencyChangeListener {
+        fun onDominantFrequencyChange(frequency: Float)
     }
 
-    var dominantFrequencyListener: OnDominantFrequencyChangedListener? = null
+    var dominantFrequencyListener: OnDominantFrequencyChangeListener? = null
 
     constructor(context: Context) : super(context) {
         init()
@@ -61,24 +59,24 @@ class VisualizerView : View {
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
-        // Step 1: Accumulate samples until we have enough for an FFT
-        accumulatedAmplitudes += newAmplitudes
+        // Accumulate audio amplitudes samples until we have enough for an FFT
+        amplitudes += newAmplitudes
 
-        if (accumulatedAmplitudes.size < fftSize) {
+        if (amplitudes.size < fftSize) {
             return // Not enough samples yet
         }
 
-        // Assuming a 50% overlap for simplicity. Adjust as needed.
+        // Assuming a 50% overlap for simplicity
         val combinedSize = fftSize
-        val combinedAmplitudes = accumulatedAmplitudes.sliceArray(0 until combinedSize)
+        val combinedAmplitudes = amplitudes.sliceArray(0 until combinedSize)
 
         // Store the half of the current amplitudes for use in the next call
-        accumulatedAmplitudes =
-            accumulatedAmplitudes.sliceArray(newAmplitudes.size until accumulatedAmplitudes.size)
+        amplitudes =
+            amplitudes.sliceArray(newAmplitudes.size until amplitudes.size)
 
+        // Compute FFT
         computeFFT(combinedAmplitudes)
 
-//        Log.d("VisualizerView", "Incoming audio data size: ${newAmplitudes.size}")
         // Apply a thresholding method to filter out background noise
         // Compute the rolling average of magnitudes
         val averageMagnitude = magnitudes.average().toFloat()
@@ -91,7 +89,6 @@ class VisualizerView : View {
 
         val noiseThreshold = recentMagnitudesAverage.average()
             .toFloat() * 2.0  // Using 2 as a multiplier, adjust as needed
-//        Log.d("VisualizerView", "noiseThreshold: $noiseThreshold")
 
         // Find the index with the maximum amplitude after FFT that's above the noise threshold
         val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
@@ -99,15 +96,13 @@ class VisualizerView : View {
 
         if (maxIndex != -1) {
             maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
-//            Log.d("VisualizerView", "maxFrequency: $maxFrequency")
 
-            // Apply a frequency range to filter out background noise
+            // Apply a frequency range filter
             if (maxFrequency in 420f..770f) {
                 // Use median frequency measured to enhance the reliability of measurement
                 // Median is less sensitive to outliers than mean
                 dominantFrequency = computeDisplayMedianFrequency(maxFrequency)
-                dominantFrequencyListener?.onDominantFrequencyChanged(dominantFrequency)
-                Log.d("VisualizerView", "Dominant Frequency: $dominantFrequency")
+                dominantFrequencyListener?.onDominantFrequencyChange(dominantFrequency)
             }
         }
 
