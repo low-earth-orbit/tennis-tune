@@ -9,6 +9,8 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
+import kotlin.math.max
+import kotlin.math.min
 
 class VisualizerView : View {
     private val paint = Paint()
@@ -19,7 +21,6 @@ class VisualizerView : View {
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
     private var magnitudes = FloatArray(fftSizeHalf)
-    private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var maxFrequency: Float = 0f
     private var amplitudes = ByteArray(0)
 
@@ -115,35 +116,41 @@ class VisualizerView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawColor(Color.BLACK) // Set the background color to black
 
         if (isAudioInputAvailable && magnitudes.isNotEmpty()) {
-            val numberOfBars = 32
+            val numberOfBars = 20
             val step = magnitudes.size / numberOfBars
-            val barWidth = width / numberOfBars.toFloat()
-            val scale = 0.5f // Adjust this value to control the vertical scale
-
-            val alpha = 0.1f  // Change this value to control the speed of interpolation
+            val barWidth =
+                width / (2 * numberOfBars).toFloat() // Each "slot" (bar + gap) is twice the bar width
 
             for (i in 0 until numberOfBars) {
-                magnitudes[i] = alpha * magnitudes[i] + (1 - alpha) * prevMagnitudes[i]
-
                 val index = i * step
                 val magnitude = magnitudes[index]
-                val x = i * barWidth
-                val normalizedMagnitude = magnitude / (256f * scale) // Adjusted normalization
-                val heightMagnitude = normalizedMagnitude * height
-                canvas.drawRect(
+                val scaleFactor = 10
+                val heightMagnitude = min(
+                    max(
+                        (magnitude / magnitudes.maxOrNull()!! * height *
+                                scaleFactor), barWidth
+                    ), height.toFloat()
+                )
+
+                paint.color = Color.argb(200, 181, 111, 233)
+
+                val x = i * 2 * barWidth
+                val yStart = (height - heightMagnitude) / 2 // Starting y-coordinate (top)
+                val yEnd = yStart + heightMagnitude // Ending y-coordinate (bottom)
+                val radius = barWidth / 2
+
+                canvas.drawRoundRect(
                     x,
-                    0f,
+                    yStart,
                     x + barWidth,
-                    heightMagnitude,
+                    yEnd,
+                    radius,
+                    radius,
                     paint
-                ) // Drawing from top to magnitude height
-
+                )
             }
-            prevMagnitudes = magnitudes.copyOf()
-
         }
     }
 
