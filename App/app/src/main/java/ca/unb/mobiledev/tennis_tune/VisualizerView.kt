@@ -16,7 +16,7 @@ class VisualizerView : View {
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
-    private val fftSize = 16384
+    private val fftSize = 4096
     private val fftSizeHalf = fftSize / 2
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
@@ -55,8 +55,9 @@ class VisualizerView : View {
     }
 
     private fun init() {
-        paint.color = resources.getColor(android.R.color.white, null)
+        paint.color = Color.argb(200, 181, 111, 233)
         paint.style = Paint.Style.FILL
+        paint.isAntiAlias = true
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
@@ -89,7 +90,7 @@ class VisualizerView : View {
         }
 
         val noiseThreshold = recentMagnitudesAverage.average()
-            .toFloat() * 2.0  // Using 2 as a multiplier, adjust as needed
+            .toFloat() * 1.5  // Multiplier, adjust as needed
 
         // Find the index with the maximum amplitude after FFT that's above the noise threshold
         val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
@@ -123,18 +124,21 @@ class VisualizerView : View {
             val barWidth =
                 width / (2 * numberOfBars).toFloat() // Each "slot" (bar + gap) is twice the bar width
 
+            val maxMagnitude = magnitudes.maxOrNull() ?: 1f
+
             for (i in 0 until numberOfBars) {
-                val index = i * step
-                val magnitude = magnitudes[index]
-                val scaleFactor = 10
+                // Sum the magnitudes for the current step
+                var sumMagnitude = 0f
+                for (j in i * step until (i + 1) * step) {
+                    sumMagnitude += magnitudes[j]
+                }
+                sumMagnitude /= step
+
                 val heightMagnitude = min(
                     max(
-                        (magnitude / magnitudes.maxOrNull()!! * height *
-                                scaleFactor), barWidth
+                        (sumMagnitude / maxMagnitude * height * 10), barWidth
                     ), height.toFloat()
                 )
-
-                paint.color = Color.argb(200, 181, 111, 233)
 
                 val x = i * 2 * barWidth
                 val yStart = (height - heightMagnitude) / 2 // Starting y-coordinate (top)
