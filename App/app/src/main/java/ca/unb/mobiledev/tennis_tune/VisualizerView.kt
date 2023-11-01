@@ -1,21 +1,17 @@
 package ca.unb.mobiledev.tennis_tune
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
-    private val fftSize = 44100
+    private val fftSize = 16384
     private val fftSizeHalf = fftSize / 2
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
@@ -39,12 +35,6 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     }
 
     var dominantFrequencyListener: OnDominantFrequencyChangeListener? = null
-
-    init {
-        paint.color = Color.argb(200, 181, 111, 233)
-        paint.style = Paint.Style.FILL
-        paint.isAntiAlias = true
-    }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
         // Accumulate audio amplitudes samples until we have enough for an FFT
@@ -120,6 +110,10 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
                 val yStart = (height - heightMagnitude) / 2 // Starting y-coordinate (top)
                 val yEnd = yStart + heightMagnitude // Ending y-coordinate (bottom)
                 val radius = barWidth / 2
+
+                //Adding color gradient to bars/rectangles
+                val shader = LinearGradient(0f, 0f, 0f, height.toFloat(), Color.parseColor("#79528A"), Color.parseColor("#E099FF"), Shader.TileMode.CLAMP)
+                paint.shader = shader
 
                 canvas.drawRoundRect(
                     x,
