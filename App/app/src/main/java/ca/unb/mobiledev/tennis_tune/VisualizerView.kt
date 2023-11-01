@@ -1,7 +1,11 @@
 package ca.unb.mobiledev.tennis_tune
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
@@ -35,6 +39,12 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     }
 
     var dominantFrequencyListener: OnDominantFrequencyChangeListener? = null
+
+    init {
+        paint.color = Color.argb(200, 181, 111, 233)
+        paint.style = Paint.Style.FILL
+        paint.isAntiAlias = true
+    }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
         // Accumulate audio amplitudes samples until we have enough for an FFT
@@ -77,7 +87,6 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
                 dominantFrequencyListener?.onDominantFrequencyChange(dominantFrequency)
             }
         }
-
         invalidate()  // Request a redraw
     }
 
