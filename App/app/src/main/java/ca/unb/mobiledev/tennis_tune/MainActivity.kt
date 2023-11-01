@@ -1,4 +1,3 @@
-//Source for visualizer and audio recording code: https://github.com/romerojhh/androidAudioVisualizer
 package ca.unb.mobiledev.tennis_tune
 
 import android.Manifest
@@ -38,7 +37,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
     private var mVisualizer: Visualizer? = null
     private var mLinearLayout: LinearLayout? = null
     private var mVisualizerView: VisualizerView? = null
-    private var mStatusTextView: TextView? = null
     private var frequencyTextView: TextView? = null
     private val job = Job()
     private lateinit var resetButton: Button
@@ -47,7 +45,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mStatusTextView = findViewById(R.id.statusTextView)
         frequencyTextView = findViewById(R.id.frequencyTextView)
 
         setSupportActionBar(binding.appBarMain.toolbar)
@@ -73,7 +70,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         resetButton = findViewById(R.id.resetButton)
         resetButton.setOnClickListener {
             mVisualizerView?.resetFrequencies()
-            frequencyTextView?.text = "Detecting ..."
+            frequencyTextView?.text = "Detecting..."
         }
     }
 

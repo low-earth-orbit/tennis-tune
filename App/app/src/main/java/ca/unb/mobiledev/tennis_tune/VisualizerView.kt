@@ -3,14 +3,15 @@ package ca.unb.mobiledev.tennis_tune
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
-import android.os.Handler
-import android.os.Looper
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
+import kotlin.math.*
 
-class VisualizerView : View {
+class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
@@ -19,15 +20,9 @@ class VisualizerView : View {
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
     private var magnitudes = FloatArray(fftSizeHalf)
-    private var prevMagnitudes = FloatArray(fftSizeHalf) // Holds the previous frame's magnitudes
     private var maxFrequency: Float = 0f
     private var amplitudes = ByteArray(0)
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val resetFrequencyRunnable = Runnable {
-        maxFrequency = 0f
-        invalidate()
-    }
     private val sampleRate =
         44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
     private var dominantFrequency: Float = 0f
@@ -45,29 +40,18 @@ class VisualizerView : View {
 
     var dominantFrequencyListener: OnDominantFrequencyChangeListener? = null
 
-    constructor(context: Context) : super(context) {
-        init()
-    }
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init()
-    }
-
-    private fun init() {
-        paint.color = resources.getColor(android.R.color.white, null)
+    init {
+        paint.color = Color.argb(200, 181, 111, 233)
         paint.style = Paint.Style.FILL
+        paint.isAntiAlias = true
     }
 
     fun updateVisualizer(newAmplitudes: ByteArray) {
         // Accumulate audio amplitudes samples until we have enough for an FFT
         amplitudes += newAmplitudes
 
-        if (amplitudes.size < fftSize) {
-            return // Not enough samples yet
-        }
-
         // Assuming a 50% overlap for simplicity
-        val combinedSize = fftSize
+        val combinedSize = min(fftSize, amplitudes.size)
         val combinedAmplitudes = amplitudes.sliceArray(0 until combinedSize)
 
         // Store the half of the current amplitudes for use in the next call
@@ -80,15 +64,13 @@ class VisualizerView : View {
         // Apply a thresholding method to filter out background noise
         // Compute the rolling average of magnitudes
         val averageMagnitude = magnitudes.average().toFloat()
-        synchronized(recentMagnitudesAverage) {
-            if (recentMagnitudesAverage.size >= maxMagnitudeAverageSize) {
-                recentMagnitudesAverage.removeAt(0)
-            }
-            recentMagnitudesAverage.add(averageMagnitude)
+        if (recentMagnitudesAverage.size >= maxMagnitudeAverageSize) {
+            recentMagnitudesAverage.removeAt(0)
         }
+        recentMagnitudesAverage.add(averageMagnitude)
 
         val noiseThreshold = recentMagnitudesAverage.average()
-            .toFloat() * 2.0  // Using 2 as a multiplier, adjust as needed
+            .toFloat() * 1.5  // Multiplier, adjust as needed
 
         // Find the index with the maximum amplitude after FFT that's above the noise threshold
         val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
@@ -105,54 +87,61 @@ class VisualizerView : View {
                 dominantFrequencyListener?.onDominantFrequencyChange(dominantFrequency)
             }
         }
-
         invalidate()  // Request a redraw
-
-        // Schedule the reset after desired interval (e.g., 1 second)
-        handler.removeCallbacks(resetFrequencyRunnable)
-        handler.postDelayed(resetFrequencyRunnable, 1000)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawColor(Color.BLACK) // Set the background color to black
 
         if (isAudioInputAvailable && magnitudes.isNotEmpty()) {
-            val numberOfBars = 32
+            val numberOfBars = 20
             val step = magnitudes.size / numberOfBars
-            val barWidth = width / numberOfBars.toFloat()
-            val scale = 0.5f // Adjust this value to control the vertical scale
+            val barWidth =
+                width / (2 * numberOfBars).toFloat() // Each "slot" (bar + gap) is twice the bar width
 
-            val alpha = 0.1f  // Change this value to control the speed of interpolation
+            val maxMagnitude = magnitudes.maxOrNull() ?: 1f
 
             for (i in 0 until numberOfBars) {
-                magnitudes[i] = alpha * magnitudes[i] + (1 - alpha) * prevMagnitudes[i]
+                // Sum the magnitudes for the current step
+                var sumMagnitude = 0f
+                for (j in i * step until (i + 1) * step) {
+                    sumMagnitude += magnitudes[j]
+                }
+                sumMagnitude /= step
 
-                val index = i * step
-                val magnitude = magnitudes[index]
-                val x = i * barWidth
-                val normalizedMagnitude = magnitude / (256f * scale) // Adjusted normalization
-                val heightMagnitude = normalizedMagnitude * height
-                canvas.drawRect(
+                val heightMagnitude = min(
+                    max(
+                        (sumMagnitude / maxMagnitude * height * 10), barWidth
+                    ), height.toFloat()
+                )
+
+                val x = i * 2 * barWidth
+                val yStart = (height - heightMagnitude) / 2 // Starting y-coordinate (top)
+                val yEnd = yStart + heightMagnitude // Ending y-coordinate (bottom)
+                val radius = barWidth / 2
+
+                //Adding color gradient to bars/rectangles
+                val shader = LinearGradient(0f, 0f, 0f, height.toFloat(), Color.parseColor("#79528A"), Color.parseColor("#E099FF"), Shader.TileMode.CLAMP)
+                paint.shader = shader
+
+                canvas.drawRoundRect(
                     x,
-                    0f,
+                    yStart,
                     x + barWidth,
-                    heightMagnitude,
+                    yEnd,
+                    radius,
+                    radius,
                     paint
-                ) // Drawing from top to magnitude height
-
+                )
             }
-            prevMagnitudes = magnitudes.copyOf()
-
         }
     }
 
-    private fun hammingWindow(data: FloatArray): FloatArray {
-        val N = data.size
-        for (i in 0 until N) {
-            data[i] *= (0.54 - 0.46 * Math.cos(2 * Math.PI * i / (N - 1))).toFloat()
+    private fun hammingWindow(data: FloatArray) {
+        val n = data.size
+        for (i in 0 until n) {
+            data[i] *= (0.54 - 0.46 * cos(2 * Math.PI * i / (n - 1))).toFloat()
         }
-        return data
     }
 
     private fun computeFFT(amplitudes: ByteArray) {

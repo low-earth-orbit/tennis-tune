@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="Detecting ..."
+            android:text="Detecting..."
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,19 +47,8 @@
             android:id="@+id/my_visualizer_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#AA000000"
             android:orientation="horizontal"
-            android:padding="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/statusTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/statusTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="Listening ..."
             app:layout_constraintBottom_toTopOf="@+id/resetButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -74,7 +63,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-        />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
