@@ -19,7 +19,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
-    private val fftSize = 44110
+    private val fftSize = 44100
     private val fftSizeHalf = fftSize / 2
     private val noiseThresholdMultiplier = 1.5
     private var floatData = FloatArray(fftSize)
