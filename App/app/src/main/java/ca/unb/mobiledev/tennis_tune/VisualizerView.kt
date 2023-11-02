@@ -85,8 +85,6 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
             // Apply a frequency range filter
             if (detectedFrequency in 420f..770f) {
-                // Use median frequency measured to enhance the reliability of measurement
-                // Median is less sensitive to outliers than mean
                 computeDisplayFrequency(detectedFrequency)
             }
         }
@@ -189,9 +187,9 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
             // If the standard deviation is below or equal to the threshold, we determine if it's time to notify the listener
             if (standardDeviation <= frequencyWindowConvergenceThreshold) {
-                // Notify the listener with the median frequency
-                val medianFrequency = frequencyWindow.average()
-                displayFrequencyListener?.onDisplayFrequencyChange(medianFrequency)
+                // Notify the listener
+                val meanFrequency = frequencyWindow.average()
+                displayFrequencyListener?.onDisplayFrequencyChange(meanFrequency)
             }
         }
     }
