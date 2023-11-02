@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         }
     }
 
-    override fun onDisplayFrequencyChange(frequency: Float) {
+    override fun onDisplayFrequencyChange(frequency: Double) {
         Log.d("MainActivity", "Display Frequency: $frequency")
 
         val stringMassDensity = 0.0015
@@ -181,17 +181,17 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     private fun frequencyToTension(
-        frequency: Float,
+        frequency: Double,
         racquetHeadSize: Double,
         stringMassDensity: Double
     ): Double {
-        val toSingleStringFreqFactor = 1.0121457 // conversion factor from elliptical membrane
-        // to square area tension; the conversion logic is based on square area assumption
-        val toMachineTensionFactor = 1.470588235 // machine
-        // tension is the pull tension; actual tension is about 32% lower than machine tension,
+        val toSingleStringFreqFactor = 1.0121457 // Conversion factor from elliptical membrane
+        // to square area tension. The conversion logic is based on square area assumption
+        val toMachineTensionFactor = 1.470588235 // Machine
+        // tension is the pull tension. Actual tension is about 32% lower than machine tension,
         // immediately after
-        // strung; despite the fact, to avoid confusion, the displayed tension in the app is to
-        // approximate the machine tension, thus requiring this conversion factor
+        // strung. Despite this fact, to avoid confusion, display tension in the app is to
+        // approximate the machine tension, thus requiring this conversion factor.
         val newtonToLbFactor = 0.2248089431
         val tensionNewton = 4 * racquetHeadSize * stringMassDensity * (frequency *
                 toSingleStringFreqFactor).pow(2)

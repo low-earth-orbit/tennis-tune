@@ -7,18 +7,19 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
-    private val fftSize = 16384
+    private val fftSize = 44110
     private val fftSizeHalf = fftSize / 2
     private val noiseThresholdMultiplier = 1.5
     private var floatData = FloatArray(fftSize)
@@ -27,19 +28,19 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private var detectedFrequency: Float = 0f
     private var amplitudes = ByteArray(0)
 
-    private val sampleRate =
-        44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
+    private val sampleRate = 44100
     private var displayFrequency: Float = 0f
     private var frequencyWindow = mutableListOf<Float>()
     private val frequencyWindowSize =
-        60  // Use a rolling window of frequencies
+        30  // Use a rolling window of frequencies
+    private val frequencyWindowConvergenceThreshold = 5f
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
     private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
     // noise
 
     interface OnDisplayFrequencyChangeListener {
-        fun onDisplayFrequencyChange(frequency: Float)
+        fun onDisplayFrequencyChange(frequency: Double)
     }
 
     var displayFrequencyListener: OnDisplayFrequencyChangeListener? = null
@@ -86,8 +87,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
             if (detectedFrequency in 420f..770f) {
                 // Use median frequency measured to enhance the reliability of measurement
                 // Median is less sensitive to outliers than mean
-                displayFrequency = computeDisplayFrequency(detectedFrequency)
-                displayFrequencyListener?.onDisplayFrequencyChange(displayFrequency)
+                computeDisplayFrequency(detectedFrequency)
             }
         }
         invalidate()  // Request a redraw
@@ -169,18 +169,30 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
         for (i in magnitudes.indices) {
             val real = floatData[2 * i]
             val imaginary = floatData[2 * i + 1]
-            magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
+            magnitudes[i] = sqrt(real * real + imaginary * imaginary)
         }
     }
 
-    private fun computeDisplayFrequency(frequency: Float): Float {
+    private fun computeDisplayFrequency(frequency: Float) {
         synchronized(frequencyWindow) {
-            Log.d("VisualizerView", "Detected Frequency: $frequency")
             if (frequencyWindow.size >= frequencyWindowSize) {
                 frequencyWindow.removeAt(0)
             }
             frequencyWindow.add(frequency)
-            return frequencyWindow.sorted()[frequencyWindow.size / 2]
+
+            // Compute the standard deviation
+            val mean = frequencyWindow.average().toFloat()
+            val sumOfSquaredDifferences = frequencyWindow.fold(0.0) { accumulator, next ->
+                accumulator + (next - mean).pow(2)
+            }
+            val standardDeviation = sqrt(sumOfSquaredDifferences / frequencyWindow.size)
+
+            // If the standard deviation is below or equal to the threshold, we determine if it's time to notify the listener
+            if (standardDeviation <= frequencyWindowConvergenceThreshold) {
+                // Notify the listener with the median frequency
+                val medianFrequency = frequencyWindow.average()
+                displayFrequencyListener?.onDisplayFrequencyChange(medianFrequency)
+            }
         }
     }
 
