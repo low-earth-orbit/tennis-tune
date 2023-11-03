@@ -36,7 +36,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private val frequencyWindowConvergenceThreshold = 5f
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
-    private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
+    private val maxMagnitudeAverageSize = 60  // For calculating background
     // noise
 
     interface OnDisplayFrequencyChangeListener {
