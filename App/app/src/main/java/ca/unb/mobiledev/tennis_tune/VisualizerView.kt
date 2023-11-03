@@ -19,7 +19,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private val paint = Paint()
     private var isAudioInputAvailable = false
 
-    private val fftSize = 44100
+    private val fftSize = 16384
     private val fftSizeHalf = fftSize / 2
     private val noiseThresholdMultiplier = 1.5
     private var floatData = FloatArray(fftSize)
@@ -32,7 +32,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private var displayFrequency: Float = 0f
     private var frequencyWindow = mutableListOf<Float>()
     private val frequencyWindowSize =
-        30  // Use a rolling window of frequencies
+        60  // Use a rolling window of frequencies
     private val frequencyWindowConvergenceThreshold = 5f
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
