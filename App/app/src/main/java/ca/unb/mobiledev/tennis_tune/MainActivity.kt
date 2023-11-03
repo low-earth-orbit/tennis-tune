@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         }
     }
 
-    override fun onDisplayFrequencyChange(frequency: Double) {
+    override fun onDisplayFrequencyChange(frequency: Float) {
         Log.d("MainActivity", "Display Frequency: $frequency")
 
         val stringMassDensity = 0.0015
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     private fun frequencyToTension(
-        frequency: Double,
+        frequency: Float,
         racquetHeadSize: Double,
         stringMassDensity: Double
     ): Double {
