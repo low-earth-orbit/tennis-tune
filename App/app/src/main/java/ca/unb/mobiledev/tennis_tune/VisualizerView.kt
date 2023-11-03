@@ -83,7 +83,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
             // Apply a frequency range filter
             if (detectedFrequency in 420f..770f) {
-                val displayFrequency = computeDisplayFrequency(detectedFrequency)
+                displayFrequency = computeDisplayFrequency(detectedFrequency)
                 displayFrequencyListener?.onDisplayFrequencyChange(displayFrequency)
             }
         }
