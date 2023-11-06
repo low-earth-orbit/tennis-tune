@@ -21,14 +21,95 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <Button
-        android:id="@+id/button_back"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="?attr/actionBarSize"
-        android:text="@string/button_back"
-        app:layout_anchor="@id/appBarLayout"
-        app:layout_anchorGravity="bottom|start" />
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_anchor="@id/appBarLayout"
+            app:layout_anchorGravity="bottom|center">
+
+            <!-- Display Unit Selector -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/rg_display_unit"
+                android:text="Display Unit" />
+
+            <RadioGroup
+                android:id="@+id/rg_display_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_lb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:checked="true"
+                    android:text="lb" />
+
+                <RadioButton
+                    android:id="@+id/rb_kg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kg" />
+            </RadioGroup>
+
+            <!-- Racquet Head Size Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/et_racquet_head_size"
+                android:text="Racquet Head Size (sq in)" />
+
+            <EditText
+                android:id="@+id/et_racquet_head_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="headSize"
+                android:inputType="numberDecimal"
+                android:text="100" />
+
+            <!-- String Mass Density Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/et_string_mass_density"
+                android:text="Stretched String Mass Density (g/m)" />
+
+            <EditText
+                android:id="@+id/et_string_mass_density"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="stringMassDensity"
+                android:inputType="numberDecimal"
+                android:text="1.50" />
+
+            <Button
+                android:id="@+id/button_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/button_back"
+                app:layout_anchor="@id/appBarLayout"
+                app:layout_anchorGravity="bottom|start" />
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
