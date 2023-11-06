@@ -9,7 +9,10 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
 
 class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val paint = Paint()
@@ -17,28 +20,28 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
     private val fftSize = 16384
     private val fftSizeHalf = fftSize / 2
+    private val noiseThresholdMultiplier = 1.5
     private var floatData = FloatArray(fftSize)
     private var fft = FloatFFT_1D(fftSize.toLong())
     private var magnitudes = FloatArray(fftSizeHalf)
-    private var maxFrequency: Float = 0f
+    private var detectedFrequency: Float = 0f
     private var amplitudes = ByteArray(0)
 
-    private val sampleRate =
-        44100  // For example, typical CD quality audio uses a sample rate of 44.1 kHz
-    private var dominantFrequency: Float = 0f
-    private var recentDisplayFrequencies = mutableListOf<Float>()
-    private val maxDisplayRecentSize =
+    private val sampleRate = 44100
+    private var displayFrequency: Float = 0f
+    private var frequencyWindow = mutableListOf<Float>()
+    private val frequencyWindowSize =
         60  // Use a rolling window of frequencies
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
     private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
     // noise
 
-    interface OnDominantFrequencyChangeListener {
-        fun onDominantFrequencyChange(frequency: Float)
+    interface OnDisplayFrequencyChangeListener {
+        fun onDisplayFrequencyChange(frequency: Float)
     }
 
-    var dominantFrequencyListener: OnDominantFrequencyChangeListener? = null
+    var displayFrequencyListener: OnDisplayFrequencyChangeListener? = null
 
     init {
         paint.color = Color.argb(200, 181, 111, 233)
@@ -69,22 +72,19 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
         }
         recentMagnitudesAverage.add(averageMagnitude)
 
-        val noiseThreshold = recentMagnitudesAverage.average()
-            .toFloat() * 1.5  // Multiplier, adjust as needed
+        val noiseThreshold = recentMagnitudesAverage.average() * noiseThresholdMultiplier
 
-        // Find the index with the maximum amplitude after FFT that's above the noise threshold
-        val maxIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
+        // Find the index with the peak amplitude after FFT that's above the noise threshold
+        val peakIndex = magnitudes.indices.filter { magnitudes[it] > noiseThreshold }
             .maxByOrNull { magnitudes[it] } ?: -1
 
-        if (maxIndex != -1) {
-            maxFrequency = (maxIndex * sampleRate / (2 * magnitudes.size)).toFloat()
+        if (peakIndex != -1) {
+            detectedFrequency = (peakIndex * sampleRate / (2 * magnitudes.size)).toFloat()
 
             // Apply a frequency range filter
-            if (maxFrequency in 420f..770f) {
-                // Use median frequency measured to enhance the reliability of measurement
-                // Median is less sensitive to outliers than mean
-                dominantFrequency = computeDisplayMedianFrequency(maxFrequency)
-                dominantFrequencyListener?.onDominantFrequencyChange(dominantFrequency)
+            if (detectedFrequency in 420f..770f) {
+                displayFrequency = computeDisplayFrequency(detectedFrequency)
+                displayFrequencyListener?.onDisplayFrequencyChange(displayFrequency)
             }
         }
         invalidate()  // Request a redraw
@@ -120,8 +120,16 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
                 val yEnd = yStart + heightMagnitude // Ending y-coordinate (bottom)
                 val radius = barWidth / 2
 
-                //Adding color gradient to bars/rectangles
-                val shader = LinearGradient(0f, 0f, 0f, height.toFloat(), Color.parseColor("#79528A"), Color.parseColor("#E099FF"), Shader.TileMode.CLAMP)
+                // Color gradient to bars/rectangles
+                val shader = LinearGradient(
+                    0f,
+                    0f,
+                    0f,
+                    height.toFloat(),
+                    Color.parseColor("#79528A"),
+                    Color.parseColor("#E099FF"),
+                    Shader.TileMode.CLAMP
+                )
                 paint.shader = shader
 
                 canvas.drawRoundRect(
@@ -158,17 +166,17 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
         for (i in magnitudes.indices) {
             val real = floatData[2 * i]
             val imaginary = floatData[2 * i + 1]
-            magnitudes[i] = kotlin.math.sqrt(real * real + imaginary * imaginary)
+            magnitudes[i] = sqrt(real * real + imaginary * imaginary)
         }
     }
 
-    private fun computeDisplayMedianFrequency(frequency: Float): Float {
-        synchronized(recentDisplayFrequencies) {
-            if (recentDisplayFrequencies.size >= maxDisplayRecentSize) {
-                recentDisplayFrequencies.removeAt(0)
+    private fun computeDisplayFrequency(frequency: Float): Float {
+        synchronized(frequencyWindow) {
+            if (frequencyWindow.size >= frequencyWindowSize) {
+                frequencyWindow.removeAt(0)
             }
-            recentDisplayFrequencies.add(frequency)
-            return recentDisplayFrequencies.sorted()[recentDisplayFrequencies.size / 2]
+            frequencyWindow.add(frequency)
+            return frequencyWindow.sorted()[frequencyWindow.size / 2]
         }
     }
 
@@ -182,10 +190,10 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
     fun resetFrequencies() {
         amplitudes = ByteArray(0)
-        recentDisplayFrequencies.clear()
+        frequencyWindow.clear()
         recentMagnitudesAverage.clear()
-        dominantFrequency = 0f
-        maxFrequency = 0f
+        displayFrequency = 0f
+        detectedFrequency = 0f
         invalidate()  // Request a redraw
     }
 }

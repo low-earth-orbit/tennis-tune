@@ -28,7 +28,7 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.*
 import kotlin.math.pow
 
-class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChangeListener {
+class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChangeListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         navView.setupWithNavController(navController)
 
         setupVisualizerFxAndUI()
-        mVisualizerView?.dominantFrequencyListener = this
+        mVisualizerView?.displayFrequencyListener = this
 
         checkRecordAudioPermission()
 
@@ -160,8 +160,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         }
     }
 
-    override fun onDominantFrequencyChange(frequency: Float) {
-        Log.d("MainActivity", "Received Dominant Frequency: $frequency")
+    override fun onDisplayFrequencyChange(frequency: Float) {
+        Log.d("MainActivity", "Display Frequency: $frequency")
 
         val stringMassDensity = 0.0015
         val racquetHeadSize = 0.0645
@@ -185,13 +185,13 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDominantFrequencyChan
         racquetHeadSize: Double,
         stringMassDensity: Double
     ): Double {
-        val toSingleStringFreqFactor = 1.0121457 // conversion factor from elliptical membrane
-        // to single string tension
-        val toMachineTensionFactor = 1.470588235 // machine
-        // tension is the pull tension; actual tension is about 32% lower than machine tension,
+        val toSingleStringFreqFactor = 1.0121457 // Conversion factor from elliptical membrane
+        // to square area tension. The conversion logic is based on square area assumption
+        val toMachineTensionFactor = 1.470588235 // Machine
+        // tension is the pull tension. Actual tension is about 32% lower than machine tension,
         // immediately after
-        // strung; despite the fact, to avoid confusion, the displayed tension in the app is to
-        // approximate the machine tension, thus requiring this conversion factor
+        // strung. Despite this fact, to avoid confusion, display tension in the app is to
+        // approximate the machine tension, thus requiring this conversion factor.
         val newtonToLbFactor = 0.2248089431
         val tensionNewton = 4 * racquetHeadSize * stringMassDensity * (frequency *
                 toSingleStringFreqFactor).pow(2)
