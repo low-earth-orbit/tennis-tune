@@ -2,6 +2,7 @@ package ca.unb.mobiledev.tennis_tune
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -17,20 +18,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import ca.unb.mobiledev.tennis_tune.databinding.ActivityMainBinding
-import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.*
 import kotlin.math.pow
 
 class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChangeListener {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val MY_PERMISSIONS_RECORD_AUDIO = 1
     private val VISUALIZER_HEIGHT_DIP = 50f
@@ -48,19 +41,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         frequencyTextView = findViewById(R.id.frequencyTextView)
 
         setSupportActionBar(binding.appBarMain.toolbar)
-
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
-            ), drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        supportActionBar?.title = "Home"
 
         setupVisualizerFxAndUI()
         mVisualizerView?.displayFrequencyListener = this
@@ -72,17 +53,23 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             mVisualizerView?.resetFrequencies()
             frequencyTextView?.text = "Detecting..."
         }
+
+        val setUpButton = Button(this).apply {
+            text = "Set Up"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setOnClickListener {
+                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        findViewById<LinearLayout>(R.id.bottomMenu).addView(setUpButton)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
         return true
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     private fun setupVisualizerFxAndUI() {
