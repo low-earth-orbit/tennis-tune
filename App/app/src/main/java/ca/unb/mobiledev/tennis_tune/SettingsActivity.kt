@@ -1,12 +1,19 @@
 package ca.unb.mobiledev.tennis_tune
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import ca.unb.mobiledev.tennis_tune.databinding.SettingsPageBinding
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: SettingsPageBinding
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private var mVisualizerView: VisualizerView? = null
+    private var frequencyTextView: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,21 +25,46 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+
+        setupListeners()
+        loadSettings()
+    }
+
+    private fun setupListeners() {
+        binding.rgDisplayUnit.setOnCheckedChangeListener { _, checkedId ->
+            sharedPreferences.edit()
+                .putString("DISPLAY_UNIT", if (checkedId == R.id.rb_lb) "lb" else "kg").apply()
+        }
+
+        binding.etRacquetHeadSize.addTextChangedListener {
+            sharedPreferences.edit().putString("RACQUET_HEAD_SIZE", it.toString()).apply()
+        }
+
+        binding.etStringMassDensity.addTextChangedListener {
+            sharedPreferences.edit().putString("STRING_MASS_DENSITY", it.toString()).apply()
+        }
+
         // TODO: Remove Go Back button if not needed as per UI design
         binding.buttonBack.setOnClickListener {
-            saveSettings()
-            finish()
+            onSettingsChanged()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle the Up/Home button
         if (item.itemId == android.R.id.home) {
-            saveSettings()
-            finish()
+            onSettingsChanged()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun onSettingsChanged() {
+        saveSettings()
+        mVisualizerView?.resetFrequencies()
+        frequencyTextView?.text = "Detecting..."
+        finish()
     }
 
     private fun saveSettings() {
@@ -51,5 +83,20 @@ class SettingsActivity : AppCompatActivity() {
         editor.putString("RACQUET_HEAD_SIZE", racquetHeadSize)
         editor.putString("STRING_MASS_DENSITY", stringMassDensity)
         editor.apply()
+    }
+
+    private fun loadSettings() {
+        when (sharedPreferences.getString("DISPLAY_UNIT", "lb")) {
+            "lb" -> binding.rbLb.isChecked = true
+            "kg" -> binding.rbKg.isChecked = true
+        }
+
+        binding.etRacquetHeadSize.setText(sharedPreferences.getString("RACQUET_HEAD_SIZE", "100"))
+        binding.etStringMassDensity.setText(
+            sharedPreferences.getString(
+                "STRING_MASS_DENSITY",
+                "1.50"
+            )
+        )
     }
 }

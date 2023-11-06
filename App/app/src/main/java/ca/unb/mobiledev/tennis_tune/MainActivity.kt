@@ -77,6 +77,16 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         findViewById<LinearLayout>(R.id.bottomMenu).addView(setUpButton)
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadSettings()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        loadSettings()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
     }
