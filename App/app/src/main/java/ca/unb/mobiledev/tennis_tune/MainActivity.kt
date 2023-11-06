@@ -34,8 +34,17 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private val job = Job()
     private lateinit var resetButton: Button
 
+    // Settings variables declaration
+    private var displayUnit: String? = null
+    private var racquetHeadSize: Double? = null
+    private var stringMassDensity: Double? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize settings from shared preferences
+        loadSettings()
+
         binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -70,6 +79,13 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
+    }
+
+    private fun loadSettings() {
+        val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+        displayUnit = sharedPreferences.getString("DISPLAY_UNIT", "lb")
+        racquetHeadSize = sharedPreferences.getString("RACQUET_HEAD_SIZE", "100")?.toDouble()
+        stringMassDensity = sharedPreferences.getString("STRING_MASS_DENSITY", "1.50")?.toDouble()
     }
 
     private fun setupVisualizerFxAndUI() {
@@ -150,19 +166,19 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     override fun onDisplayFrequencyChange(frequency: Float) {
         Log.d("MainActivity", "Display Frequency: $frequency")
 
-        val stringMassDensity = 0.0015
-        val racquetHeadSize = 0.0645
+        if (racquetHeadSize != null && stringMassDensity != null) {
+            val tensionLb = frequencyToTension(frequency, racquetHeadSize!!, stringMassDensity!!)
+            val tensionDisplay = if (displayUnit == "kg") {
+                val tensionKg = tensionLb * 0.45359237
+                "%.1f kg".format(tensionKg)
+            } else {
+                "%.1f lb".format(tensionLb)
+            }
 
-        val tension = frequencyToTension(frequency, racquetHeadSize, stringMassDensity)
-
-        runOnUiThread {
-            frequencyTextView?.text = buildString {
-                append(
-                    "Frequency: ${"%.0f".format(frequency)} Hz\nTension: ${
-                        "%.1f"
-                            .format(tension)
-                    } lb"
-                )
+            runOnUiThread {
+                frequencyTextView?.text = buildString {
+                    append("Frequency: ${"%.0f".format(frequency)} Hz\nTension: $tensionDisplay")
+                }
             }
         }
     }
@@ -172,6 +188,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         racquetHeadSize: Double,
         stringMassDensity: Double
     ): Double {
+        val headSizeSqM = racquetHeadSize * 0.00064516
+        val densityKgM = stringMassDensity / 1000.0
         val toSingleStringFreqFactor = 1.0121457 // Conversion factor from elliptical membrane
         // to square area tension. The conversion logic is based on square area assumption
         val toMachineTensionFactor = 1.470588235 // Machine
@@ -180,7 +198,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         // strung. Despite this fact, to avoid confusion, display tension in the app is to
         // approximate the machine tension, thus requiring this conversion factor.
         val newtonToLbFactor = 0.2248089431
-        val tensionNewton = 4 * racquetHeadSize * stringMassDensity * (frequency *
+        val tensionNewton = 4 * headSizeSqM * densityKgM * (frequency *
                 toSingleStringFreqFactor).pow(2)
         return tensionNewton * toMachineTensionFactor * newtonToLbFactor
     }
