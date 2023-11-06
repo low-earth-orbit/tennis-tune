@@ -59,8 +59,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
         resetButton = findViewById(R.id.resetButton)
         resetButton.setOnClickListener {
-            mVisualizerView?.resetFrequencies()
-            frequencyTextView?.text = "Detecting..."
+            resetVisualizer()
         }
 
         val setUpButton = Button(this).apply {
@@ -92,10 +91,26 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     private fun loadSettings() {
+        // Previous settings values before loading new ones
+        val prevDisplayUnit = displayUnit
+        val prevRacquetHeadSize = racquetHeadSize
+        val prevStringMassDensity = stringMassDensity
+
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
         displayUnit = sharedPreferences.getString("DISPLAY_UNIT", "lb")
         racquetHeadSize = sharedPreferences.getString("RACQUET_HEAD_SIZE", "100")?.toDouble()
         stringMassDensity = sharedPreferences.getString("STRING_MASS_DENSITY", "1.50")?.toDouble()
+
+        // Check if any setting value has changed
+        if (prevDisplayUnit != displayUnit || prevRacquetHeadSize != racquetHeadSize || prevStringMassDensity != stringMassDensity) {
+            // Reset the visualizer and frequency text as the settings have changed
+            resetVisualizer()
+        }
+    }
+
+    private fun resetVisualizer() {
+        mVisualizerView?.resetFrequencies()
+        frequencyTextView?.text = "Detecting..."
     }
 
     private fun setupVisualizerFxAndUI() {
