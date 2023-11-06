@@ -18,15 +18,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import ca.unb.mobiledev.tennis_tune.databinding.ActivityMainBinding
+import ca.unb.mobiledev.tennis_tune.databinding.HomePageBinding
 import kotlinx.coroutines.*
 import kotlin.math.pow
 
 class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChangeListener {
 
-    private lateinit var binding: ActivityMainBinding
-    private val MY_PERMISSIONS_RECORD_AUDIO = 1
-    private val VISUALIZER_HEIGHT_DIP = 50f
+    private lateinit var binding: HomePageBinding
+    private val recordAudioPermission = 1
+    private val visualizerHeightDip = 50f
     private var mVisualizer: Visualizer? = null
     private var mLinearLayout: LinearLayout? = null
     private var mVisualizerView: VisualizerView? = null
@@ -36,10 +36,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.topBarHome)
+        setSupportActionBar(binding.topBarHome)
         supportActionBar?.title = "Home"
 
         frequencyTextView = findViewById(R.id.frequencyTextView)
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         mVisualizerView = VisualizerView(this)
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            (this.VISUALIZER_HEIGHT_DIP * resources.displayMetrics.density).toInt()
+            (this.visualizerHeightDip * resources.displayMetrics.density).toInt()
         )
         mLinearLayout = findViewById(R.id.my_visualizer_container)
         mLinearLayout?.addView(mVisualizerView)
@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.RECORD_AUDIO),
-                MY_PERMISSIONS_RECORD_AUDIO
+                recordAudioPermission
             )
         } else {
             // Permission has already been granted, proceed with audio capture
