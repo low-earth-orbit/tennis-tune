@@ -1,6 +1,7 @@
 package ca.unb.mobiledev.tennis_tune
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import ca.unb.mobiledev.tennis_tune.databinding.SettingsPageBinding
 
@@ -12,12 +13,24 @@ class SettingsActivity : AppCompatActivity() {
         binding = SettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setSupportActionBar(binding.toolbar)
-//        supportActionBar?.title = "Settings" // Correct the title here
+        setSupportActionBar(binding.topBarSettings)
+        supportActionBar?.title = "Settings"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        // Set up the action when the button is pressed
+        // TODO: Remove Go Back button if not needed as per UI design
         binding.buttonBack.setOnClickListener {
-            finish() // Finish this activity and go back to the previous one
+            finish()
         }
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle the Up/Home button
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 }

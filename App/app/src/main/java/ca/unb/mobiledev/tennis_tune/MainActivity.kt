@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        frequencyTextView = findViewById(R.id.frequencyTextView)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        setSupportActionBar(binding.appBarMain.topBarHome)
         supportActionBar?.title = "Home"
 
+        frequencyTextView = findViewById(R.id.frequencyTextView)
         setupVisualizerFxAndUI()
         mVisualizerView?.displayFrequencyListener = this
 
