@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private var racquetHeadSize: Double? = null
     private var stringMassDensity: Double? = null
 
+    private lateinit var audioRecord: AudioRecord
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -90,6 +92,21 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         loadSettings()
     }
 
+    override fun onStop() {
+        super.onStop()
+        stopAudioCapture()
+    }
+
+    private fun stopAudioCapture() {
+        // Cancel the coroutine job
+        job.cancel()
+
+        audioRecord.apply {
+            stop()
+            release()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
     }
@@ -129,6 +146,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     override fun onPause() {
         super.onPause()
+        // Stop the recording and release resources
+        stopAudioCapture()
+
+        // If the activity is finishing, release the visualizer as well
         if (isFinishing) {
             mVisualizer?.release()
         }
@@ -169,7 +190,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             val bufferSizeInBytes =
                 AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
 
-            val audioRecord =
+            audioRecord =
                 AudioRecord(
                     audioSource,
                     sampleRateInHz,
