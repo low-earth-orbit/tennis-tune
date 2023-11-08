@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import ca.unb.mobiledev.tennis_tune.databinding.HomePageBinding
@@ -150,7 +151,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                     Toast.makeText(this, "Permission denied to record audio", Toast.LENGTH_SHORT)
                         .show()
                 }
-                return
             }
         }
     }
@@ -206,26 +206,32 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                 Manifest.permission.RECORD_AUDIO
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // If permission was denied previously and the user checked "Don't ask again"
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.RECORD_AUDIO
                 )
             ) {
-                // Show an explanation to the user
-                Toast.makeText(
+                AlertDialog.Builder(this)
+                    .setTitle("Permission needed")
+                    .setMessage("This permission is needed for string tension measurement")
+                    .setPositiveButton("Ok") { _, _ ->
+                        ActivityCompat.requestPermissions(
+                            this@MainActivity,
+                            arrayOf(Manifest.permission.RECORD_AUDIO),
+                            recordAudioPermission
+                        )
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create().show()
+            } else {
+                ActivityCompat.requestPermissions(
                     this,
-                    "We need audio permission for string tension measurement",
-                    Toast.LENGTH_LONG
-                ).show()
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    recordAudioPermission
+                )
             }
-
-            // Request the permission
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.RECORD_AUDIO),
-                recordAudioPermission
-            )
         } else {
             // Permission has already been granted, proceed with audio capture
             startAudioCapture()
