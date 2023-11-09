@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private val recordAudioPermission = 1
     private val visualizerHeightDip = 50f
     private var mVisualizer: Visualizer? = null
-    private var mLinearLayout: LinearLayout? = null
     private var mVisualizerView: VisualizerView? = null
     private var frequencyTextView: TextView? = null
     private val job = Job()
@@ -55,10 +54,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         setContentView(binding.root)
 
         setSupportActionBar(binding.topBarHome)
-        supportActionBar?.title = "Home"
+        supportActionBar?.title = getString(R.string.title_home_page)
 
         frequencyTextView = findViewById(R.id.frequencyTextView)
-        setupVisualizerFxAndUI()
+        setupVisualizer()
         mVisualizerView?.displayFrequencyListener = this
 
         checkRecordAudioPermission()
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         }
 
         val setUpButton = Button(this).apply {
-            text = "Set Up"
+            text = context.getString(R.string.button_settings)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -101,9 +100,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         // Cancel the coroutine job
         job.cancel()
 
-        audioRecord.apply {
-            stop()
-            release()
+        if (audioRecord.state == AudioRecord.STATE_INITIALIZED && audioRecord.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
+            audioRecord.stop()
         }
     }
 
@@ -131,17 +129,17 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     private fun resetVisualizer() {
         mVisualizerView?.resetFrequencies()
-        frequencyTextView?.text = "Detecting..."
+        frequencyTextView?.text = this.getString(R.string.text_detecting)
     }
 
-    private fun setupVisualizerFxAndUI() {
+    private fun setupVisualizer() {
         mVisualizerView = VisualizerView(this)
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             (this.visualizerHeightDip * resources.displayMetrics.density).toInt()
         )
-        mLinearLayout = findViewById(R.id.my_visualizer_container)
-        mLinearLayout?.addView(mVisualizerView)
+        val visualizerContainer = findViewById<LinearLayout>(R.id.my_visualizer_container)
+        visualizerContainer?.addView(mVisualizerView)
     }
 
     override fun onPause() {

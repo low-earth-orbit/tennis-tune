@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Detecting..."
+                android:text="@string/text_detecting"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|bottom"
                 android:padding="16dp"
-                android:text="Reset"
+                android:text="@string/button_reset"
                 app:layout_constraintBottom_toTopOf="@+id/bottomMenu"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
