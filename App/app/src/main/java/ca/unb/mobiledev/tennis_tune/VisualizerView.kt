@@ -3,9 +3,7 @@ package ca.unb.mobiledev.tennis_tune
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Paint
-import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import org.jtransforms.fft.FloatFFT_1D
@@ -107,30 +105,18 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
                 for (j in i * step until (i + 1) * step) {
                     sumMagnitude += magnitudes[j]
                 }
-                sumMagnitude /= step
+                val averageMagnitudeInStep = sumMagnitude / step
 
-                val heightMagnitude = min(
+                val stepHeight = min(
                     max(
-                        (sumMagnitude / maxMagnitude * height * 10), barWidth
+                        ((averageMagnitudeInStep / maxMagnitude) * height * 10), barWidth
                     ), height.toFloat()
                 )
 
-                val x = i * 2 * barWidth
-                val yStart = (height - heightMagnitude) / 2 // Starting y-coordinate (top)
-                val yEnd = yStart + heightMagnitude // Ending y-coordinate (bottom)
-                val radius = barWidth / 2
-
-                // Color gradient to bars/rectangles
-                val shader = LinearGradient(
-                    0f,
-                    0f,
-                    0f,
-                    height.toFloat(),
-                    Color.parseColor("#79528A"),
-                    Color.parseColor("#E099FF"),
-                    Shader.TileMode.CLAMP
-                )
-                paint.shader = shader
+                val x = i * 2f * barWidth
+                val yStart = (height - stepHeight) / 2f // Starting y-coordinate (top)
+                val yEnd = yStart + stepHeight // Ending y-coordinate (bottom)
+                val radius = barWidth / 2f
 
                 canvas.drawRoundRect(
                     x,

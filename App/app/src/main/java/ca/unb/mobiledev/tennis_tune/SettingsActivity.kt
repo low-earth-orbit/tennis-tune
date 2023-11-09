@@ -63,7 +63,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun onSettingsChanged() {
         saveSettings()
         mVisualizerView?.resetFrequencies()
-        frequencyTextView?.text = "Detecting..."
+        frequencyTextView?.text = this.getString(R.string.text_detecting)
         finish()
     }
 
