@@ -21,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.topBarSettings)
-        supportActionBar?.title = "Settings"
+        supportActionBar?.title = getString(R.string.title_settings_page)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
@@ -45,7 +45,6 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreferences.edit().putString("STRING_MASS_DENSITY", it.toString()).apply()
         }
 
-        // TODO: Remove Go Back button if not needed as per UI design
         binding.buttonBack.setOnClickListener {
             onSettingsChanged()
         }

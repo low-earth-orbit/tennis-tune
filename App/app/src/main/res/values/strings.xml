@@ -6,10 +6,8 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
-    <string name="menu_home">Home</string>
     <string name="text_detecting">Detecting…</string>
     <string name="button_reset">Reset</string>
-
     <string name="title_settings_page">Settings</string>
     <string name="button_start">Start</string>
     <string name="button_back">Go Back</string>
@@ -21,6 +19,6 @@
     <string name="string_mass_density_1_50">1.50</string>
     <string name="radio_button_kg">kg</string>
     <string name="radio_button_lb">lb</string>
-    <string name="button_settings_label">Set Up</string>
+    <string name="title_home_page">Home</string>
 
 </resources>

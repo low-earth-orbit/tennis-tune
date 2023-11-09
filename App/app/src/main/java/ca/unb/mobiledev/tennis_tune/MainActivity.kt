@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         setContentView(binding.root)
 
         setSupportActionBar(binding.topBarHome)
-        supportActionBar?.title = "Home"
+        supportActionBar?.title = getString(R.string.title_home_page)
 
         frequencyTextView = findViewById(R.id.frequencyTextView)
         setupVisualizer()
