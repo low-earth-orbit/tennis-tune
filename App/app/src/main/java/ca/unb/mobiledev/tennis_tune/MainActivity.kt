@@ -1,21 +1,19 @@
 package ca.unb.mobiledev.tennis_tune
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.media.audiofx.Visualizer
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import ca.unb.mobiledev.tennis_tune.databinding.HomePageBinding
@@ -31,11 +29,9 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private lateinit var binding: HomePageBinding
     private val recordAudioPermission = 1
     private val visualizerHeightDip = 50f
-    private var mVisualizer: Visualizer? = null
     private var mVisualizerView: VisualizerView? = null
     private var frequencyTextView: TextView? = null
-    private val job = Job()
-    private lateinit var resetButton: Button
+    private var job = Job()
 
     // Settings variables declaration
     private var displayUnit: String? = null
@@ -43,12 +39,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private var stringMassDensity: Double? = null
 
     private lateinit var audioRecord: AudioRecord
+    private var bufferSizeInBytes: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize settings from shared preferences
-        loadSettings()
 
         binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -57,17 +51,19 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         supportActionBar?.title = getString(R.string.title_home_page)
 
         frequencyTextView = findViewById(R.id.frequencyTextView)
+
+        // Initialize AudioRecord
+        initAudioRecord()
+
+        // Set up audio visualization
         setupVisualizer()
-        mVisualizerView?.displayFrequencyListener = this
 
-        checkRecordAudioPermission()
-
-        resetButton = findViewById(R.id.resetButton)
+        val resetButton: Button = findViewById(R.id.resetButton)
         resetButton.setOnClickListener {
-            resetVisualizer()
+            resetFrequencyText()
         }
 
-        val setUpButton = Button(this).apply {
+        val settingsButton = Button(this).apply {
             text = context.getString(R.string.button_settings)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -78,35 +74,53 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                 startActivity(intent)
             }
         }
-        findViewById<LinearLayout>(R.id.bottomMenu).addView(setUpButton)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadSettings()
+        findViewById<LinearLayout>(R.id.bottomMenu).addView(settingsButton)
     }
 
     override fun onStart() {
         super.onStart()
+        // Initialize settings from shared preferences
         loadSettings()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onResume() {
+        // onResume() is called when the activity comes into the foreground
+        super.onResume()
+        // Check audio permission & start audio recording
+        checkRecordAudioPermission()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Stop the recording and release resources
         stopAudioCapture()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        audioRecord.release()
+    }
+    
+    @SuppressLint("MissingPermission")
+    private fun initAudioRecord() {
+        val audioSource = MediaRecorder.AudioSource.MIC
+        val sampleRateInHz = 44100
+        val channelConfig = AudioFormat.CHANNEL_IN_MONO
+        val audioFormat = AudioFormat.ENCODING_PCM_8BIT
+        bufferSizeInBytes =
+            AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+
+        audioRecord =
+            AudioRecord(audioSource, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes)
     }
 
     private fun stopAudioCapture() {
         // Cancel the coroutine job
         job.cancel()
 
-        if (audioRecord.state == AudioRecord.STATE_INITIALIZED && audioRecord.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
+        if (::audioRecord.isInitialized && audioRecord.state == AudioRecord.STATE_INITIALIZED && audioRecord.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
             audioRecord.stop()
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        return true
     }
 
     private fun loadSettings() {
@@ -122,18 +136,19 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
         // Check if any setting value has changed
         if (prevDisplayUnit != displayUnit || prevRacquetHeadSize != racquetHeadSize || prevStringMassDensity != stringMassDensity) {
-            // Reset the visualizer and frequency text as the settings have changed
-            resetVisualizer()
+            // Reset the text as the settings have changed
+            resetFrequencyText()
         }
     }
 
-    private fun resetVisualizer() {
+    private fun resetFrequencyText() {
         mVisualizerView?.resetFrequencies()
         frequencyTextView?.text = this.getString(R.string.text_detecting)
     }
 
     private fun setupVisualizer() {
         mVisualizerView = VisualizerView(this)
+        mVisualizerView?.displayFrequencyListener = this
         mVisualizerView!!.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             (this.visualizerHeightDip * resources.displayMetrics.density).toInt()
@@ -142,80 +157,26 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         visualizerContainer?.addView(mVisualizerView)
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Stop the recording and release resources
-        stopAudioCapture()
-
-        // If the activity is finishing, release the visualizer as well
-        if (isFinishing) {
-            mVisualizer?.release()
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            recordAudioPermission -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission was granted, start audio capture
-                    startAudioCapture()
-                } else {
-                    // Permission denied, disable the functionality that depends on this permission.
-                    mVisualizerView?.setAudioInputAvailable(false)
-                    Toast.makeText(this, "Permission denied to record audio", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }
-    }
-
+    @SuppressLint("MissingPermission")
     private fun startAudioCapture() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (::audioRecord.isInitialized && audioRecord.state != AudioRecord.STATE_INITIALIZED) {
+            initAudioRecord() // Re-initialize if necessary
+        }
 
-            val audioSource = MediaRecorder.AudioSource.MIC
-            val sampleRateInHz = 44100
-            val channelConfig = AudioFormat.CHANNEL_IN_MONO
-            val audioFormat = AudioFormat.ENCODING_PCM_8BIT
-            val bufferSizeInBytes =
-                AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+        val buffer = ByteArray(bufferSizeInBytes)
+        job = Job() // Recreate the job object
+        val scope = CoroutineScope(Dispatchers.IO + job)
 
-            audioRecord =
-                AudioRecord(
-                    audioSource,
-                    sampleRateInHz,
-                    channelConfig,
-                    audioFormat,
-                    bufferSizeInBytes
-                )
+        scope.launch {
+            audioRecord.startRecording()
+            mVisualizerView?.setAudioInputAvailable(true)
 
-            val buffer = ByteArray(bufferSizeInBytes)
-            val scope = CoroutineScope(Dispatchers.IO + job)
-
-            scope.launch {
-                audioRecord.startRecording()
-                mVisualizerView?.setAudioInputAvailable(true)
-
-                while (isActive) {
-                    val readSize =
-                        audioRecord.read(buffer, 0, buffer.size, AudioRecord.READ_BLOCKING)
-                    mVisualizerView?.updateVisualizer(buffer.sliceArray(0 until readSize))
-                }
-                audioRecord.stop()
-                mVisualizerView?.setAudioInputAvailable(false)
+            while (isActive) {
+                val readSize = audioRecord.read(buffer, 0, buffer.size, AudioRecord.READ_BLOCKING)
+                mVisualizerView?.updateVisualizer(buffer.sliceArray(0 until readSize))
             }
-        } else {
-            // Handle the case where permission is not granted
+            audioRecord.stop()
             mVisualizerView?.setAudioInputAvailable(false)
-            Toast.makeText(this, "Permission denied to record audio", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -225,32 +186,26 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                 Manifest.permission.RECORD_AUDIO
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            // If permission was denied previously and the user checked "Don't ask again"
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.RECORD_AUDIO
                 )
             ) {
-                AlertDialog.Builder(this)
-                    .setTitle("Permission needed")
-                    .setMessage("This permission is needed for string tension measurement")
-                    .setPositiveButton("Ok") { _, _ ->
-                        ActivityCompat.requestPermissions(
-                            this@MainActivity,
-                            arrayOf(Manifest.permission.RECORD_AUDIO),
-                            recordAudioPermission
-                        )
-                    }
-                    .setNegativeButton("Cancel") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create().show()
-            } else {
-                ActivityCompat.requestPermissions(
+                // Show an explanation to the user
+                Toast.makeText(
                     this,
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    recordAudioPermission
-                )
+                    "We need audio permission for string tension measurement",
+                    Toast.LENGTH_LONG
+                ).show()
             }
+
+            // Request the permission
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                recordAudioPermission
+            )
         } else {
             // Permission has already been granted, proceed with audio capture
             startAudioCapture()
