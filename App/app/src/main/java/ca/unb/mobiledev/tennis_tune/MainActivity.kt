@@ -50,31 +50,9 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         setSupportActionBar(binding.topBarHome)
         supportActionBar?.title = getString(R.string.title_home_page)
 
-        frequencyTextView = findViewById(R.id.frequencyTextView)
-
-        // Initialize AudioRecord
+        initUI()
         initAudioRecord()
-
-        // Set up audio visualization
         setupVisualizer()
-
-        val resetButton: Button = findViewById(R.id.resetButton)
-        resetButton.setOnClickListener {
-            resetFrequencyText()
-        }
-
-        val settingsButton = Button(this).apply {
-            text = context.getString(R.string.button_settings)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            setOnClickListener {
-                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-                startActivity(intent)
-            }
-        }
-        findViewById<LinearLayout>(R.id.bottomMenu).addView(settingsButton)
     }
 
     override fun onStart() {
@@ -99,6 +77,27 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     override fun onDestroy() {
         super.onDestroy()
         audioRecord.release()
+    }
+
+    private fun initUI() {
+        frequencyTextView = binding.frequencyTextView
+
+        binding.resetButton.setOnClickListener {
+            resetFrequencyText()
+        }
+
+        val settingsButton = Button(this).apply {
+            text = getString(R.string.button_settings)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setOnClickListener {
+                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        binding.bottomMenu.addView(settingsButton)
     }
     
     @SuppressLint("MissingPermission")
