@@ -109,16 +109,16 @@
                     android:autofillHints="stringMassDensity"
                     android:inputType="numberDecimal"
                     android:maxWidth="200dp"
-                    android:text="@string/string_mass_density_1_50" />
+                    android:text="@string/string_mass_density" />
 
             </LinearLayout>
 
             <Button
-                android:id="@+id/button_back"
+                android:id="@+id/button_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/button_back"
+                android:text="@string/button_save"
                 app:layout_anchor="@id/appBarLayout"
                 app:layout_anchorGravity="bottom|start" />
 
