@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import ca.unb.mobiledev.tennis_tune.databinding.SettingsPageBinding
 
 class SettingsActivity : AppCompatActivity() {
@@ -36,10 +37,25 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        binding.etRacquetHeadSize.addTextChangedListener {
+            updateSaveButtonState()
+        }
+
+        binding.etStringMassDensity.addTextChangedListener {
+            updateSaveButtonState()
+        }
+
+        binding.rgDisplayUnit.setOnCheckedChangeListener { _, _ ->
+            updateSaveButtonState()
+        }
+
         binding.buttonSave.setOnClickListener {
             if (validateInputs()) {
-                saveSettings()
-                Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
+                if (hasUnsavedChanges()) {
+                    saveSettings()
+                    Toast.makeText(this, getString(R.string.settings_changed), Toast.LENGTH_SHORT)
+                        .show()
+                }
                 finish()
             } else {
                 Toast.makeText(this, getString(R.string.invalid_inputs), Toast.LENGTH_SHORT).show()
@@ -56,6 +72,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.rbKg.isChecked = (originalDisplayUnit == "kg")
         binding.etRacquetHeadSize.setText(originalRacquetHeadSize)
         binding.etStringMassDensity.setText(originalStringMassDensity)
+
+        updateSaveButtonState()
     }
 
     private fun setupInputValidation() {
@@ -159,5 +177,9 @@ class SettingsActivity : AppCompatActivity() {
         return currentDisplayUnit != originalDisplayUnit ||
                 currentRacquetHeadSize != originalRacquetHeadSize ||
                 currentStringMassDensity != originalStringMassDensity
+    }
+
+    private fun updateSaveButtonState() {
+        binding.buttonSave.isEnabled = hasUnsavedChanges()
     }
 }
