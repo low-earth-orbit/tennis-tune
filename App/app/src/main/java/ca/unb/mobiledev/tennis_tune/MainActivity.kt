@@ -86,6 +86,19 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             resetFrequencyText()
         }
 
+        val racquetsButton = Button(this).apply {
+            text = getString(R.string.racquets)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setOnClickListener {
+                val intent = Intent(this@MainActivity, RacquetListActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        binding.bottomMenu.addView(racquetsButton)
+
         val settingsButton = Button(this).apply {
             text = getString(R.string.button_settings)
             layoutParams = LinearLayout.LayoutParams(
@@ -99,7 +112,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         }
         binding.bottomMenu.addView(settingsButton)
     }
-    
+
     @SuppressLint("MissingPermission")
     private fun initAudioRecord() {
         val audioSource = MediaRecorder.AudioSource.MIC
