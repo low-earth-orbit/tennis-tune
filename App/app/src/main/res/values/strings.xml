@@ -27,5 +27,10 @@
     <string name="discard">Discard</string>
     <string name="cancel">Cancel</string>
     <string name="settings_changed">Settings changed</string>
+    <string name="racquets">Racquets</string>
+    <string name="add_a_racquet">Add a racquet</string>
+    <string name="racquet_info">Racquet Information</string>
+    <string name="racquet_name">Racquet Name</string>
+    <string name="new_racquet">New Racquet</string>
 
 </resources>
