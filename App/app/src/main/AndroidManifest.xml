@@ -28,6 +28,8 @@
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/Theme.Tennis_tune.NoActionBar" />
-
+        <activity
+            android:name=".RacquetListActivity"
+            android:theme="@style/Theme.Tennis_tune.NoActionBar" />
     </application>
 </manifest>
