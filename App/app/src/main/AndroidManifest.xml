@@ -16,6 +16,10 @@
         android:theme="@style/Theme.Tennis_tune"
         tools:targetApi="34">
         <activity
+            android:name=".SplashScreen"
+            android:label="SplashScreen"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Tennis_tune.NoActionBar">
@@ -28,6 +32,6 @@
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/Theme.Tennis_tune.NoActionBar" />
-
     </application>
+
 </manifest>
