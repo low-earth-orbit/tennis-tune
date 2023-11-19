@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.topBarHome)
-        supportActionBar?.title = getString(R.string.title_home_page)
+        // setSupportActionBar(binding.topBarHome)
+        // supportActionBar?.title = getString(R.string.title_home_page)
 
         initUI()
         initAudioRecord()
@@ -218,14 +218,14 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             val tensionLb = frequencyToTension(frequency, racquetHeadSize!!, stringMassDensity!!)
             val tensionDisplay = if (displayUnit == "kg") {
                 val tensionKg = tensionLb * 0.45359237
-                "%.1f kg".format(tensionKg)
+                "%.1f\nkg".format(tensionKg)
             } else {
-                "%.1f lb".format(tensionLb)
+                "%.1f\nlb".format(tensionLb)
             }
 
             runOnUiThread {
                 frequencyTextView?.text = buildString {
-                    append("Frequency: ${"%.0f".format(frequency)} Hz\nTension: $tensionDisplay")
+                    append(tensionDisplay)
                 }
             }
         }
