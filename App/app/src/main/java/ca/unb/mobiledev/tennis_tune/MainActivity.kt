@@ -221,9 +221,9 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             val tensionLb = frequencyToTension(frequency, racquetHeadSize!!, stringMassDensity!!)
             val tensionDisplay = if (displayUnit == "kg") {
                 val tensionKg = tensionLb * 0.45359237
-                "%.1f\n".format(tensionKg)
+                "%.1f".format(tensionKg)
             } else {
-                "%.1f\n".format(tensionLb)
+                "%.1f".format(tensionLb)
             }
 
             val unitDisplay = if (displayUnit == "kg") {
