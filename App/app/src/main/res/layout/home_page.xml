@@ -23,7 +23,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         android:fillViewport="true">
 
@@ -31,13 +31,12 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tensionTextView"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
+                android:layout_height="0dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
                 android:elevation="2dp"
@@ -53,38 +52,39 @@
                 app:autoSizeTextType="uniform"
                 app:layout_constraintBottom_toTopOf="@+id/unitTextView"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/unitTextView"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="0dp"
                 android:elevation="2dp"
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal|top"
                 android:padding="0dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textSize="34sp"
+                app:autoSizeMaxTextSize="34sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="2sp"
                 app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tensionTextView" />
 
             <LinearLayout
                 android:id="@+id/my_visualizer_container"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="0dp"
                 android:elevation="2dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/resetButton"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/unitTextView" />
 
@@ -92,27 +92,25 @@
                 android:id="@+id/resetButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:padding="16dp"
+                android:padding="8dp"
                 android:text="@string/button_reset"
                 android:textColor="#E1BEE7"
                 app:layout_constraintBottom_toTopOf="@+id/bottomMenu"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/my_visualizer_container" />
 
             <LinearLayout
                 android:id="@+id/bottomMenu"
                 android:layout_width="0dp"
-                android:layout_height="92dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_height="0dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/resetButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
