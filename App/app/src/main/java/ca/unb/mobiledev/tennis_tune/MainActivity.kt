@@ -30,7 +30,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private val recordAudioPermission = 1
     private val visualizerHeightDip = 50f
     private var mVisualizerView: VisualizerView? = null
-    private var frequencyTextView: TextView? = null
+    private var tensionTextView: TextView? = null
+    private var unitTextView: TextView? = null
     private var job = Job()
 
     // Settings variables declaration
@@ -80,7 +81,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     private fun initUI() {
-        frequencyTextView = binding.frequencyTextView
+        tensionTextView = binding.tensionTextView
+        unitTextView = binding.unitTextView
 
         binding.resetButton.setOnClickListener {
             resetFrequencyText()
@@ -142,7 +144,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     private fun resetFrequencyText() {
         mVisualizerView?.resetFrequencies()
-        frequencyTextView?.text = this.getString(R.string.text_detecting)
+        tensionTextView?.text = this.getString(R.string.text_detecting)
+        unitTextView?.text = ""
     }
 
     private fun setupVisualizer() {
@@ -218,14 +221,23 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             val tensionLb = frequencyToTension(frequency, racquetHeadSize!!, stringMassDensity!!)
             val tensionDisplay = if (displayUnit == "kg") {
                 val tensionKg = tensionLb * 0.45359237
-                "%.1f\nkg".format(tensionKg)
+                "%.1f\n".format(tensionKg)
             } else {
-                "%.1f\nlb".format(tensionLb)
+                "%.1f\n".format(tensionLb)
+            }
+
+            val unitDisplay = if (displayUnit == "kg") {
+                "kg"
+            } else {
+                "lb"
             }
 
             runOnUiThread {
-                frequencyTextView?.text = buildString {
+                tensionTextView?.text = buildString {
                     append(tensionDisplay)
+                }
+                unitTextView?.text = buildString {
+                    append(unitDisplay)
                 }
             }
         }

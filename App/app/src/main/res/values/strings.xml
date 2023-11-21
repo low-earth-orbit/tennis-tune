@@ -6,7 +6,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
-    <string name="text_detecting">Detecting…</string>
+    <string name="text_detecting">Listening…</string>
     <string name="button_reset">Reset</string>
     <string name="title_settings_page">Settings</string>
     <string name="button_start">Start</string>

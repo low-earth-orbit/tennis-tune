@@ -35,37 +35,65 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
-                android:id="@+id/frequencyTextView"
+                android:id="@+id/tensionTextView"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="300dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
                 android:elevation="2dp"
-                android:fontFamily="monospace"
-                android:padding="16dp"
+                android:fontFamily="sans-serif"
+                android:gravity="bottom|center_horizontal"
+                android:maxLines="1"
                 android:text="@string/text_detecting"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textSize="60sp"
-                app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                app:autoSizeMaxTextSize="120sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="2sp"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintBottom_toTopOf="@+id/unitTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/unitTextView"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:elevation="2dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center_horizontal|top"
+                android:padding="0dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textSize="34sp"
+                app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tensionTextView" />
+
             <LinearLayout
                 android:id="@+id/my_visualizer_container"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
                 android:elevation="2dp"
+                android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/resetButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/frequencyTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/unitTextView" />
 
             <Button
                 android:id="@+id/resetButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:padding="16dp"
                 android:text="@string/button_reset"
                 android:textColor="#E1BEE7"
@@ -78,12 +106,15 @@
                 android:id="@+id/bottomMenu"
                 android:layout_width="0dp"
                 android:layout_height="92dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/resetButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
