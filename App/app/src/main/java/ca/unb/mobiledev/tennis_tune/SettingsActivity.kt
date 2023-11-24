@@ -49,7 +49,7 @@ class SettingsActivity : AppCompatActivity() {
             updateSaveButtonState()
         }
 
-        binding.buttonSave.setOnClickListener {
+        binding.settingsButtonSave.setOnClickListener {
             if (validateInputs()) {
                 if (hasUnsavedChanges()) {
                     saveSettings()
@@ -180,6 +180,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateSaveButtonState() {
-        binding.buttonSave.isEnabled = hasUnsavedChanges()
+        binding.settingsButtonSave.isEnabled = hasUnsavedChanges()
     }
 }

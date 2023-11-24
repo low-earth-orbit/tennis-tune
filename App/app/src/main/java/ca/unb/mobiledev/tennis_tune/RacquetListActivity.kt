@@ -1,6 +1,7 @@
 package ca.unb.mobiledev.tennis_tune
 
 import RacquetAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -43,9 +44,8 @@ class RacquetListActivity : AppCompatActivity() {
 
         val fab: FloatingActionButton = findViewById(R.id.fab_add_racquet)
         fab.setOnClickListener {
-            // Navigate to Add/Edit Activity
-//            val intent = Intent(this, AddEditRacquetActivity::class.java)
-//            startActivity(intent)
+            val intent = Intent(this@RacquetListActivity, AddEditRacquetActivity::class.java)
+            startActivity(intent)
         }
     }
 

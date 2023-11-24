@@ -32,5 +32,6 @@
     <string name="racquet_info">Racquet Information</string>
     <string name="racquet_name">Racquet Name</string>
     <string name="new_racquet">New Racquet</string>
+    <string name="add_edit_racquet">Add/Edit Racquet</string>
 
 </resources>

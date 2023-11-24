@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".AddEditRacquetActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -17,7 +17,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Theme.Tennis_tune.PopupOverlay"
-            app:title="@string/button_settings" />
+            app:title="@string/add_edit_racquet" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,50 +35,34 @@
             app:layout_anchor="@id/appBarLayout"
             app:layout_anchorGravity="bottom|center">
 
-            <!-- Display Unit Selector -->
+            <!-- Racquet Name Input -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:labelFor="@+id/rg_display_unit"
-                android:text="@string/display_unit_label" />
+                android:labelFor="@+id/edit_racquet_racquet_name"
+                android:text="@string/racquet_name" />
 
-            <RadioGroup
-                android:id="@+id/rg_display_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <EditText
+                android:id="@+id/edit_racquet_racquet_name"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/rb_lb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:checked="true"
-                    android:minHeight="48dp"
-                    android:padding="8dp"
-                    android:text="@string/radio_button_lb" />
-
-                <RadioButton
-                    android:id="@+id/rb_kg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:checked="true"
-                    android:minHeight="48dp"
-                    android:padding="12dp"
-                    android:text="@string/radio_button_kg" />
-            </RadioGroup>
+                android:autofillHints="racquetName"
+                android:inputType="text"
+                android:maxWidth="400dp"
+                android:text="@string/new_racquet" />
 
             <!-- Racquet Head Size Input -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:labelFor="@+id/et_racquet_head_size"
+                android:labelFor="@+id/edit_racquet_racquet_head_size"
                 android:text="@string/racquet_head_size_sq_in_label" />
 
             <EditText
-                android:id="@+id/et_racquet_head_size"
+                android:id="@+id/edit_racquet_racquet_head_size"
                 android:layout_width="100dp"
                 android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
@@ -92,11 +76,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:labelFor="@+id/et_string_mass_density"
+                android:labelFor="@+id/edit_racquet_string_mass_density"
                 android:text="@string/string_mass_density_g_m_label" />
 
             <EditText
-                android:id="@+id/et_string_mass_density"
+                android:id="@+id/edit_racquet_string_mass_density"
                 android:layout_width="100dp"
                 android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
@@ -106,7 +90,7 @@
                 android:text="@string/string_mass_density" />
 
             <Button
-                android:id="@+id/settings_button_save"
+                android:id="@+id/edit_racquet_button_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
