@@ -1,5 +1,6 @@
 package ca.unb.mobiledev.tennis_tune.ui
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.R
+import ca.unb.mobiledev.tennis_tune.RacquetListActivity
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
-class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
+class RacquetAdapter(private val context: Context, private val onClick: (Racquet) -> Unit) :
     ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
     private var selectedRacquet: Racquet? = null
 
@@ -65,15 +67,14 @@ class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
         val currentList = currentList
         val deletedIndex = currentList.indexOf(deletedRacquet)
 
-        if (currentList.size > 1) {
+        if (deletedRacquet == selectedRacquet && currentList.size > 1) {
             val newSelectedIndex = if (deletedIndex == 0) 1 else deletedIndex - 1
             selectedRacquet = currentList[newSelectedIndex]
-            notifyItemRemoved(deletedIndex)
-            notifyItemChanged(newSelectedIndex)
-        } else {
+            RacquetListActivity.saveSelectedRacquetId(context, selectedRacquet!!.id)
+        } else if (currentList.size == 1) {
             selectedRacquet = null
-            notifyItemRemoved(deletedIndex)
         }
+        notifyDataSetChanged()
     }
 
     class RacquetDiffCallback : DiffUtil.ItemCallback<Racquet>() {

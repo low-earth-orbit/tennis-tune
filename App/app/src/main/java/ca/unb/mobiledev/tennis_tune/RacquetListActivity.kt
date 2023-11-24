@@ -67,8 +67,8 @@ class RacquetListActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        adapter = RacquetAdapter { racquet ->
-            saveSelectedRacquetId(racquet.id)
+        adapter = RacquetAdapter(this) { racquet ->
+            saveSelectedRacquetId(this, racquet.id)
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -93,7 +93,7 @@ class RacquetListActivity : AppCompatActivity() {
                         .setMessage("Are you sure you want to delete this racquet?")
                         .setPositiveButton("Delete") { dialog, which ->
                             viewModel.deleteRacquet(racquetToDelete)
-                            // The actual deletion and list update will be handled by the LiveData observer
+                            adapter.selectNextAfterDeletion(racquetToDelete)
                         }
                         .setNegativeButton("Cancel") { dialog, which ->
                             adapter.notifyItemChanged(position) // Revert the swipe
@@ -126,17 +126,14 @@ class RacquetListActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun saveSelectedRacquetId(selectedRacquetId: Int) {
-        val sharedPreferences = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-        with(sharedPreferences.edit()) {
-            putInt("SELECTED_RACQUET_ID", selectedRacquetId)
-            apply()
-        }
-    }
-
     companion object {
-        const val ADD_RACQUET_REQUEST_CODE = 1
-        const val EDIT_RACQUET_REQUEST_CODE = 2
-        const val RACQUET_ID = "racquet_id"
+        fun saveSelectedRacquetId(context: Context, selectedRacquetId: Int) {
+            val sharedPreferences =
+                context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putInt("SELECTED_RACQUET_ID", selectedRacquetId)
+                apply()
+            }
+        }
     }
 }
