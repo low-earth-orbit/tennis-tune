@@ -9,16 +9,21 @@ import ca.unb.mobiledev.tennis_tune.repository.RacquetRepository
 import kotlinx.coroutines.launch
 
 class RacquetViewModel(application: Application) : AndroidViewModel(application) {
-    private val racquetRepository: RacquetRepository = RacquetRepository(application)
+    private val repository: RacquetRepository = RacquetRepository(application)
 
     // LiveData holding the list of racquets
-    val allRacquets: LiveData<List<Racquet>> = racquetRepository.getAllRacquets()
+    val allRacquets: LiveData<List<Racquet>> = repository.getAllRacquets()
 
     fun insert(racquet: Racquet) = viewModelScope.launch {
-        racquetRepository.insert(racquet)
+        repository.insert(racquet)
     }
 
-    fun delete(racquet: Racquet) = viewModelScope.launch {
-        racquetRepository.delete(racquet)
+    fun deleteRacquet(racquet: Racquet) = viewModelScope.launch {
+        if (allRacquets.value.orEmpty().size > 1) {
+            repository.delete(racquet)
+            // Additional logic to select the next racquet
+        } else {
+            // Handle the case where there's only one racquet
+        }
     }
 }

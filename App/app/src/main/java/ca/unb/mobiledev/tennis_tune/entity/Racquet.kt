@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "racquets")
 data class Racquet(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "head_size") val headSize: Double,
     @ColumnInfo(name = "string_mass_density") val stringMassDensity: Double

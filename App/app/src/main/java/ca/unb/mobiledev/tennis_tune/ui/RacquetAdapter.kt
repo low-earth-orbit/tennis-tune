@@ -13,8 +13,7 @@ import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
 class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
     ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
-
-    private var selectedPos = RecyclerView.NO_POSITION
+    private var selectedRacquet: Racquet? = null
 
     inner class RacquetViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -24,16 +23,24 @@ class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
 
         init {
             itemView.setOnClickListener {
-                notifyItemChanged(selectedPos)
-                selectedPos = adapterPosition
-                notifyItemChanged(selectedPos)
-                onClick(getItem(adapterPosition))
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val newSelectedRacquet = getItem(position)
+                    if (selectedRacquet != newSelectedRacquet) {
+                        selectedRacquet?.let { oldRacquet ->
+                            notifyItemChanged(currentList.indexOf(oldRacquet))
+                        }
+                        selectedRacquet = newSelectedRacquet
+                        notifyItemChanged(position)
+                        onClick(newSelectedRacquet)
+                    }
+                }
             }
         }
 
-        fun bind(racquet: Racquet, isSelected: Boolean) {
+        fun bind(racquet: Racquet) {
             racquetNameTextView.text = racquet.name
-            radioButtonSelect.isChecked = isSelected
+            radioButtonSelect.isChecked = racquet == selectedRacquet
         }
     }
 
@@ -45,13 +52,27 @@ class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
 
     override fun onBindViewHolder(holder: RacquetViewHolder, position: Int) {
         val racquet = getItem(position)
-        holder.bind(racquet, selectedPos == position)
+        holder.bind(racquet)
+    }
 
-        holder.itemView.setOnClickListener {
-            notifyItemChanged(selectedPos)
-            selectedPos = holder.layoutPosition
-            notifyItemChanged(selectedPos)
-            onClick(racquet)
+    fun setSelectedRacquetById(selectedRacquetId: Int) {
+        val currentList = currentList
+        selectedRacquet = currentList.find { it.id == selectedRacquetId }
+        notifyDataSetChanged()
+    }
+
+    fun selectNextAfterDeletion(deletedRacquet: Racquet) {
+        val currentList = currentList
+        val deletedIndex = currentList.indexOf(deletedRacquet)
+
+        if (currentList.size > 1) {
+            val newSelectedIndex = if (deletedIndex == 0) 1 else deletedIndex - 1
+            selectedRacquet = currentList[newSelectedIndex]
+            notifyItemRemoved(deletedIndex)
+            notifyItemChanged(newSelectedIndex)
+        } else {
+            selectedRacquet = null
+            notifyItemRemoved(deletedIndex)
         }
     }
 

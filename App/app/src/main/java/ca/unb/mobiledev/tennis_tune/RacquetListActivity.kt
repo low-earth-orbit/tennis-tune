@@ -1,8 +1,10 @@
 package ca.unb.mobiledev.tennis_tune
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -10,7 +12,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
-import ca.unb.mobiledev.tennis_tune.entity.Racquet
 import ca.unb.mobiledev.tennis_tune.ui.RacquetAdapter
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModel
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModelFactory
@@ -20,7 +21,6 @@ class RacquetListActivity : AppCompatActivity() {
     private lateinit var binding: RacquetListBinding
     private lateinit var adapter: RacquetAdapter
     private lateinit var viewModel: RacquetViewModel
-    private var selectedRacquetId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,16 +31,30 @@ class RacquetListActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.racquets)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        
+        setupRecyclerView()
+
+        val sharedPreferences = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        val selectedRacquetId = sharedPreferences.getInt("SELECTED_RACQUET_ID", -1)
+
+        if (selectedRacquetId != -1) {
+            adapter.setSelectedRacquetById(selectedRacquetId)
+        }
 
         viewModel = ViewModelProvider(
             this,
             RacquetViewModelFactory(application)
         )[RacquetViewModel::class.java]
 
-        setupRecyclerView()
+
 
         viewModel.allRacquets.observe(this) { racquets ->
-            racquets?.let { adapter.submitList(it) }
+            racquets?.let {
+                adapter.submitList(it)
+                if (selectedRacquetId != -1 && it.any { racquet -> racquet.id == selectedRacquetId }) {
+                    adapter.setSelectedRacquetById(selectedRacquetId)
+                }
+            }
         }
 
         val fab: FloatingActionButton = binding.fabAddRacquet
@@ -53,9 +67,7 @@ class RacquetListActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
         adapter = RacquetAdapter { racquet ->
-            selectedRacquetId = racquet.id
-            // TODO
-            // Persist the selection in SharedPreferences
+            saveSelectedRacquetId(racquet.id)
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -67,26 +79,36 @@ class RacquetListActivity : AppCompatActivity() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                return false // We are not moving items up/down
+                return false // Not moving items up/down
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val racquetToDelete = adapter.currentList[position]
 
-                AlertDialog.Builder(this@RacquetListActivity)
-                    .setTitle("Delete Racquet")
-                    .setMessage("Are you sure you want to delete this racquet?")
-                    .setPositiveButton("Delete") { dialog, which ->
-                        viewModel.delete(racquetToDelete)
-                    }
-                    .setNegativeButton("Cancel") { dialog, which ->
-                        adapter.notifyItemChanged(position) // Revert the swipe
-                    }
-                    .setOnCancelListener {
-                        adapter.notifyItemChanged(position) // Revert the swipe if cancelled
-                    }
-                    .show()
+                if (adapter.currentList.size > 1) {
+                    AlertDialog.Builder(this@RacquetListActivity)
+                        .setTitle("Delete Racquet")
+                        .setMessage("Are you sure you want to delete this racquet?")
+                        .setPositiveButton("Delete") { dialog, which ->
+                            viewModel.deleteRacquet(racquetToDelete)
+                            adapter.selectNextAfterDeletion(racquetToDelete)
+                        }
+                        .setNegativeButton("Cancel") { dialog, which ->
+                            adapter.notifyItemChanged(position) // Revert the swipe
+                        }
+                        .setOnCancelListener {
+                            adapter.notifyItemChanged(position) // Revert the swipe if cancelled
+                        }
+                        .show()
+                } else {
+                    Toast.makeText(
+                        this@RacquetListActivity,
+                        "Cannot delete the last racquet",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    adapter.notifyItemChanged(position) // Undo the swipe
+                }
             }
         }
 
@@ -103,11 +125,12 @@ class RacquetListActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun adapterOnClick(racquet: Racquet) {
-        // Handle the racquet item click here
-//        val intent = Intent(this, AddEditRacquetActivity::class.java)
-//        intent.putExtra(RACQUET_ID, racquet.id)
-//        startActivityForResult(intent, EDIT_RACQUET_REQUEST_CODE)
+    private fun saveSelectedRacquetId(selectedRacquetId: Int) {
+        val sharedPreferences = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putInt("SELECTED_RACQUET_ID", selectedRacquetId)
+            apply()
+        }
     }
 
     companion object {
