@@ -18,4 +18,10 @@ class RacquetRepository(application: Application) {
     fun getAllRacquets(): LiveData<List<Racquet>> {
         return racquetDao.getAll()
     }
+    
+    fun delete(racquet: Racquet) {
+        AppDatabase.databaseWriterExecutor.execute {
+            racquetDao.delete(racquet)
+        }
+    }
 }

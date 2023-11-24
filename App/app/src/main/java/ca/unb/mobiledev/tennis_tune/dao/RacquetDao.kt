@@ -24,5 +24,8 @@ interface RacquetDao {
     suspend fun update(racquet: Racquet)
 
     @Delete
-    suspend fun delete(racquet: Racquet)
+    fun delete(racquet: Racquet)
+    
+    @Query("DELETE FROM racquets WHERE id = :id")
+    fun deleteById(id: Int)
 }

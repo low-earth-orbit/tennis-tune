@@ -139,6 +139,7 @@ class SettingsActivity : AppCompatActivity() {
         if (item.itemId == android.R.id.home) {
             if (hasUnsavedChanges()) {
                 AlertDialog.Builder(this)
+                    .setTitle("Unsaved Changes")
                     .setMessage(getString(R.string.unsaved_changes_message))
                     .setPositiveButton(getString(R.string.discard)) { _, _ -> onBackPressedDispatcher.onBackPressed() }
                     .setNegativeButton(getString(R.string.cancel), null)

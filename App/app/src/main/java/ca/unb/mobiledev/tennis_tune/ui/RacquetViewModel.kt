@@ -18,5 +18,7 @@ class RacquetViewModel(application: Application) : AndroidViewModel(application)
         racquetRepository.insert(racquet)
     }
 
-    // Add other CRUD operations here as needed, like delete or update
+    fun delete(racquet: Racquet) = viewModelScope.launch {
+        racquetRepository.delete(racquet)
+    }
 }
