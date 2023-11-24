@@ -1,6 +1,5 @@
 package ca.unb.mobiledev.tennis_tune
 
-import RacquetAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -10,15 +9,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
+import ca.unb.mobiledev.tennis_tune.ui.RacquetAdapter
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModel
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RacquetListActivity : AppCompatActivity() {
     private lateinit var binding: RacquetListBinding
-
     private lateinit var adapter: RacquetAdapter
     private lateinit var viewModel: RacquetViewModel
+    private var selectedRacquetId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,8 +50,10 @@ class RacquetListActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        adapter = RacquetAdapter {
-            // Implement click listener logic here if needed
+        adapter = RacquetAdapter { racquet ->
+            selectedRacquetId = racquet.id
+            // TODO
+            // Persist the selection in SharedPreferences
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
