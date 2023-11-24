@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
+import ca.unb.mobiledev.tennis_tune.entity.Racquet
 import ca.unb.mobiledev.tennis_tune.ui.RacquetAdapter
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModel
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModelFactory
@@ -21,6 +22,7 @@ class RacquetListActivity : AppCompatActivity() {
     private lateinit var binding: RacquetListBinding
     private lateinit var adapter: RacquetAdapter
     private lateinit var viewModel: RacquetViewModel
+    private var currentRacquets: List<Racquet> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,7 @@ class RacquetListActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.racquets)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        
+
         setupRecyclerView()
 
         val sharedPreferences = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
@@ -46,10 +48,9 @@ class RacquetListActivity : AppCompatActivity() {
             RacquetViewModelFactory(application)
         )[RacquetViewModel::class.java]
 
-
-
         viewModel.allRacquets.observe(this) { racquets ->
             racquets?.let {
+                currentRacquets = it
                 adapter.submitList(it)
                 if (selectedRacquetId != -1 && it.any { racquet -> racquet.id == selectedRacquetId }) {
                     adapter.setSelectedRacquetById(selectedRacquetId)
@@ -86,13 +87,13 @@ class RacquetListActivity : AppCompatActivity() {
                 val position = viewHolder.adapterPosition
                 val racquetToDelete = adapter.currentList[position]
 
-                if (adapter.currentList.size > 1) {
+                if (currentRacquets.size > 1) {
                     AlertDialog.Builder(this@RacquetListActivity)
                         .setTitle("Delete Racquet")
                         .setMessage("Are you sure you want to delete this racquet?")
                         .setPositiveButton("Delete") { dialog, which ->
                             viewModel.deleteRacquet(racquetToDelete)
-                            adapter.selectNextAfterDeletion(racquetToDelete)
+                            // The actual deletion and list update will be handled by the LiveData observer
                         }
                         .setNegativeButton("Cancel") { dialog, which ->
                             adapter.notifyItemChanged(position) // Revert the swipe
