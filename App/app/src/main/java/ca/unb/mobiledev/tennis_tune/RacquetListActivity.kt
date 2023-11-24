@@ -4,8 +4,8 @@ import RacquetAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
@@ -18,9 +18,7 @@ class RacquetListActivity : AppCompatActivity() {
     private lateinit var binding: RacquetListBinding
 
     private lateinit var adapter: RacquetAdapter
-    private val viewModel: RacquetViewModel by viewModels {
-        RacquetViewModelFactory(application)
-    }
+    private lateinit var viewModel: RacquetViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,21 +30,31 @@ class RacquetListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
+        viewModel = ViewModelProvider(
+            this,
+            RacquetViewModelFactory(application)
+        )[RacquetViewModel::class.java]
+
+        setupRecyclerView()
+
         viewModel.allRacquets.observe(this) { racquets ->
-            racquets?.let {
-                adapter = RacquetAdapter(it) { racquet -> adapterOnClick(racquet) }
-                recyclerView.adapter = adapter
-            }
+            racquets?.let { adapter.submitList(it) }
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        val fab: FloatingActionButton = findViewById(R.id.fab_add_racquet)
+        val fab: FloatingActionButton = binding.fabAddRacquet
         fab.setOnClickListener {
             val intent = Intent(this@RacquetListActivity, AddEditRacquetActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun setupRecyclerView() {
+        val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
+        adapter = RacquetAdapter {
+            // Implement click listener logic here if needed
+        }
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

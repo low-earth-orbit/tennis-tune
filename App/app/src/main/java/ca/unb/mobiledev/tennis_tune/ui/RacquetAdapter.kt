@@ -2,13 +2,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.R
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
-
-class RacquetAdapter(private val items: List<Racquet>, private val onClick: (Racquet) -> Unit) :
-    RecyclerView.Adapter<RacquetAdapter.RacquetViewHolder>() {
+class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
+    ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
 
     class RacquetViewHolder(itemView: View, val onClick: (Racquet) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
@@ -35,9 +36,16 @@ class RacquetAdapter(private val items: List<Racquet>, private val onClick: (Rac
     }
 
     override fun onBindViewHolder(holder: RacquetViewHolder, position: Int) {
-        val racquet = items[position]
-        holder.bind(racquet)
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = items.size
+    class RacquetDiffCallback : DiffUtil.ItemCallback<Racquet>() {
+        override fun areItemsTheSame(oldItem: Racquet, newItem: Racquet): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Racquet, newItem: Racquet): Boolean {
+            return oldItem == newItem
+        }
+    }
 }
