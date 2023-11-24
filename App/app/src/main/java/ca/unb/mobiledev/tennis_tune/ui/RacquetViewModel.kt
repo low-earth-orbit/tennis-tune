@@ -12,7 +12,7 @@ class RacquetViewModel(application: Application) : AndroidViewModel(application)
     private val racquetRepository: RacquetRepository = RacquetRepository(application)
 
     // LiveData holding the list of racquets
-    val allRacquets: LiveData<List<Racquet>>? = racquetRepository.getAllRacquets()
+    val allRacquets: LiveData<List<Racquet>> = racquetRepository.getAllRacquets()
 
     fun insert(racquet: Racquet) = viewModelScope.launch {
         racquetRepository.insert(racquet)

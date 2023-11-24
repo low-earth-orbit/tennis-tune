@@ -25,9 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
         // Singleton access to the database
         fun getDatabase(context: Context): AppDatabase {
             val tempInstance = INSTANCE
-            if (tempInstance != null) {
-                return tempInstance
-            }
+            if (tempInstance != null) return tempInstance
             synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,

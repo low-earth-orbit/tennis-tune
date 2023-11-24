@@ -31,9 +31,10 @@
         android:id="@+id/fab_add_racquet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp"
         android:clickable="true"
-        android:contentDescription="@string/add_a_racquet"
+        android:contentDescription="@string/add_a_new_racquet"
         android:focusable="true"
         app:srcCompat="@android:drawable/ic_input_add" />
 

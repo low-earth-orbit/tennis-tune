@@ -2,16 +2,19 @@ package ca.unb.mobiledev.tennis_tune
 
 import RacquetAdapter
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModel
 import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RacquetListActivity : AppCompatActivity() {
+    private lateinit var binding: RacquetListBinding
 
     private lateinit var adapter: RacquetAdapter
     private val viewModel: RacquetViewModel by viewModels {
@@ -20,10 +23,16 @@ class RacquetListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.racquet_list)
+        binding = RacquetListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setSupportActionBar(binding.topBarSettings)
+        supportActionBar?.title = getString(R.string.racquets)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        viewModel.allRacquets?.observe(this) { racquets ->
+        viewModel.allRacquets.observe(this) { racquets ->
             racquets?.let {
                 adapter = RacquetAdapter(it) { racquet -> adapterOnClick(racquet) }
                 recyclerView.adapter = adapter
@@ -38,6 +47,15 @@ class RacquetListActivity : AppCompatActivity() {
 //            val intent = Intent(this, AddEditRacquetActivity::class.java)
 //            startActivity(intent)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle the Up/Home button
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun adapterOnClick(racquet: Racquet) {
