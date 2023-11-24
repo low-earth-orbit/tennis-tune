@@ -54,6 +54,10 @@ class RacquetListActivity : AppCompatActivity() {
                 adapter.submitList(it)
                 if (selectedRacquetId != -1 && it.any { racquet -> racquet.id == selectedRacquetId }) {
                     adapter.setSelectedRacquetById(selectedRacquetId)
+                } else if (selectedRacquetId == -1 && it.isNotEmpty()) {
+                    val defaultRacquetId = it.first().id
+                    saveSelectedRacquetId(this, defaultRacquetId)
+                    adapter.setSelectedRacquetById(defaultRacquetId)
                 }
             }
         }

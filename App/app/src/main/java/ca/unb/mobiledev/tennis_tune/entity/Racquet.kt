@@ -11,4 +11,13 @@ data class Racquet(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "head_size") val headSize: Double,
     @ColumnInfo(name = "string_mass_density") val stringMassDensity: Double
-)
+) {
+    companion object {
+        fun defaultRacquet() = Racquet(
+            id = 0,
+            name = "Default Racquet",
+            headSize = 100.0,
+            stringMassDensity = 1.53
+        )
+    }
+}

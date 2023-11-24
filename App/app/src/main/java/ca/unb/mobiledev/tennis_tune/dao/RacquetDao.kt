@@ -12,13 +12,16 @@ import ca.unb.mobiledev.tennis_tune.entity.Racquet
 @Dao
 interface RacquetDao {
     @Query("SELECT * FROM racquets")
-    fun getAll(): LiveData<List<Racquet>>
+    suspend fun getAllRacquetsSynchronously(): List<Racquet>
+
+    @Query("SELECT * FROM racquets")
+    fun getAllRacquets(): LiveData<List<Racquet>>
 
     @Query("SELECT * FROM racquets WHERE id = :id")
     fun getById(id: Int): LiveData<Racquet>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(racquet: Racquet)
+    suspend fun insert(racquet: Racquet): Int
 
     @Update
     suspend fun update(racquet: Racquet)
