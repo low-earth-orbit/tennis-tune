@@ -16,7 +16,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
 import ca.unb.mobiledev.tennis_tune.databinding.HomePageBinding
+import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModel
+import ca.unb.mobiledev.tennis_tune.ui.RacquetViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,20 +30,24 @@ import kotlin.math.pow
 class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChangeListener {
 
     private lateinit var binding: HomePageBinding
-    private val recordAudioPermission = 1
-    private val visualizerHeightDip = 50f
     private var mVisualizerView: VisualizerView? = null
     private var tensionTextView: TextView? = null
     private var unitTextView: TextView? = null
-    private var job = Job()
 
-    // Settings variables declaration
+    // Parameters for tension calculation
     private var displayUnit: String? = null
     private var racquetHeadSize: Double? = null
     private var stringMassDensity: Double? = null
 
+    // Audio processing
     private lateinit var audioRecord: AudioRecord
     private var bufferSizeInBytes: Int = 0
+    private val recordAudioPermission = 1
+    private val visualizerHeightDip = 50f
+    private var job = Job()
+
+    // Database connectivity
+    private lateinit var viewModel: RacquetViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +58,11 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         setSupportActionBar(binding.topBarHome)
         supportActionBar?.title = getString(R.string.title_home_page)
 
+        viewModel = ViewModelProvider(
+            this,
+            RacquetViewModelFactory(application)
+        )[RacquetViewModel::class.java]
+
         initUI()
         initAudioRecord()
         setupVisualizer()
@@ -60,6 +72,8 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         super.onStart()
         // Initialize settings from shared preferences
         loadSettings()
+        // Load racquet specs
+        loadSelectedRacquetDetails()
     }
 
     override fun onResume() {
@@ -71,6 +85,10 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     override fun onPause() {
         super.onPause()
+
+        // Reset frequency text
+        resetFrequencyText()
+
         // Stop the recording and release resources
         stopAudioCapture()
     }
@@ -138,20 +156,19 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     private fun loadSettings() {
-        // Previous settings values before loading new ones
-        val prevDisplayUnit = displayUnit
-        val prevRacquetHeadSize = racquetHeadSize
-        val prevStringMassDensity = stringMassDensity
-
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
         displayUnit = sharedPreferences.getString("DISPLAY_UNIT", "lb")
-        racquetHeadSize = sharedPreferences.getString("RACQUET_HEAD_SIZE", "100")?.toDouble()
-        stringMassDensity = sharedPreferences.getString("STRING_MASS_DENSITY", "1.50")?.toDouble()
+    }
 
-        // Check if any setting value has changed
-        if (prevDisplayUnit != displayUnit || prevRacquetHeadSize != racquetHeadSize || prevStringMassDensity != stringMassDensity) {
-            // Reset the text as the settings have changed
-            resetFrequencyText()
+    private fun loadSelectedRacquetDetails() {
+        val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+        val selectedRacquetId = sharedPreferences.getInt("SELECTED_RACQUET_ID", -1)
+
+        if (selectedRacquetId != -1) {
+            viewModel.getRacquetById(selectedRacquetId).observe(this) { racquet ->
+                racquetHeadSize = racquet.headSize
+                stringMassDensity = racquet.stringMassDensity
+            }
         }
     }
 

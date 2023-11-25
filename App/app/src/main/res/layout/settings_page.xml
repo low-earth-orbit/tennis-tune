@@ -83,6 +83,7 @@
                 android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
                 android:autofillHints="headSize"
+                android:enabled="false"
                 android:inputType="numberDecimal"
                 android:maxWidth="200dp"
                 android:text="@string/racquet_head_size_100" />
@@ -101,6 +102,7 @@
                 android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
                 android:autofillHints="stringMassDensity"
+                android:enabled="false"
                 android:inputType="numberDecimal"
                 android:maxWidth="200dp"
                 android:text="@string/string_mass_density" />

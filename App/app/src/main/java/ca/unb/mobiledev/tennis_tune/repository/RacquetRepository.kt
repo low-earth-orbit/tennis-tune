@@ -21,6 +21,10 @@ class RacquetRepository(application: Application) {
         return racquetDao.getAllRacquets()
     }
 
+    fun getRacquetById(id: Int): LiveData<Racquet> {
+        return racquetDao.getById(id)
+    }
+
     suspend fun delete(racquet: Racquet) {
         racquetDao.delete(racquet)
     }
