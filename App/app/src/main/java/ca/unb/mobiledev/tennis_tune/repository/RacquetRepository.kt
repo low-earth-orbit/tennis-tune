@@ -9,7 +9,7 @@ import ca.unb.mobiledev.tennis_tune.entity.Racquet
 class RacquetRepository(application: Application) {
     private val racquetDao: RacquetDao = getDatabase(application).racquetDao()
 
-    suspend fun insert(racquet: Racquet): Int {
+    suspend fun insert(racquet: Racquet) {
         return racquetDao.insert(racquet)
     }
 
@@ -23,5 +23,13 @@ class RacquetRepository(application: Application) {
 
     suspend fun delete(racquet: Racquet) {
         racquetDao.delete(racquet)
+    }
+
+    suspend fun checkAndInsertDefaultRacquet() {
+        val racquets = getAllRacquetsSynchronously()
+        if (racquets.isEmpty()) {
+            val defaultRacquet = Racquet.defaultRacquet()
+            insert(defaultRacquet)
+        }
     }
 }

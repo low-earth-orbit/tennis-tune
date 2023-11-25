@@ -21,7 +21,7 @@ interface RacquetDao {
     fun getById(id: Int): LiveData<Racquet>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(racquet: Racquet): Int
+    suspend fun insert(racquet: Racquet)
 
     @Update
     suspend fun update(racquet: Racquet)

@@ -34,13 +34,10 @@ class RacquetListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        setupRecyclerView()
-
-        val sharedPreferences = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-        val selectedRacquetId = sharedPreferences.getInt("SELECTED_RACQUET_ID", -1)
-
-        if (selectedRacquetId != -1) {
-            adapter.setSelectedRacquetById(selectedRacquetId)
+        val fab: FloatingActionButton = binding.fabAddRacquet
+        fab.setOnClickListener {
+            val intent = Intent(this@RacquetListActivity, AddEditRacquetActivity::class.java)
+            startActivity(intent)
         }
 
         viewModel = ViewModelProvider(
@@ -52,21 +49,25 @@ class RacquetListActivity : AppCompatActivity() {
             racquets?.let {
                 currentRacquets = it
                 adapter.submitList(it)
-                if (selectedRacquetId != -1 && it.any { racquet -> racquet.id == selectedRacquetId }) {
-                    adapter.setSelectedRacquetById(selectedRacquetId)
-                } else if (selectedRacquetId == -1 && it.isNotEmpty()) {
+
+                val sharedPreferences =
+                    getSharedPreferences("AppSettings", MODE_PRIVATE)
+                val selectedRacquetId = sharedPreferences.getInt("SELECTED_RACQUET_ID", -1)
+
+                if (selectedRacquetId == -1 && it.size == 1) {
                     val defaultRacquetId = it.first().id
-                    saveSelectedRacquetId(this, defaultRacquetId)
+                    saveSelectedRacquetId(
+                        application.applicationContext,
+                        defaultRacquetId
+                    )
                     adapter.setSelectedRacquetById(defaultRacquetId)
+                } else if (selectedRacquetId != -1) {
+                    adapter.setSelectedRacquetById(selectedRacquetId)
                 }
             }
         }
 
-        val fab: FloatingActionButton = binding.fabAddRacquet
-        fab.setOnClickListener {
-            val intent = Intent(this@RacquetListActivity, AddEditRacquetActivity::class.java)
-            startActivity(intent)
-        }
+        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
