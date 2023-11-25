@@ -1,18 +1,18 @@
 package ca.unb.mobiledev.tennis_tune.ui
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.R
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
-class RacquetAdapter(private val context: Context, private val onClick: (Racquet) -> Unit) :
+class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
     ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
     private var selectedRacquet: Racquet? = null
 
@@ -20,7 +20,8 @@ class RacquetAdapter(private val context: Context, private val onClick: (Racquet
         RecyclerView.ViewHolder(itemView) {
         private val racquetNameTextView: TextView =
             itemView.findViewById(R.id.racquet_list_item_racquet_name)
-        private val radioButtonSelect: RadioButton = itemView.findViewById(R.id.radioButtonSelect)
+        private val racquetListItemCheck: ImageView =
+            itemView.findViewById(R.id.racquet_list_item_check)
 
         init {
             itemView.setOnClickListener {
@@ -42,9 +43,9 @@ class RacquetAdapter(private val context: Context, private val onClick: (Racquet
         fun bind(racquet: Racquet) {
             racquetNameTextView.text = racquet.name
             if (selectedRacquet == null) {
-                radioButtonSelect.isChecked = true // Pre-check the default racquet
+                racquetListItemCheck.isVisible = true // Pre-check the default racquet
             } else {
-                radioButtonSelect.isChecked = racquet == selectedRacquet
+                racquetListItemCheck.isVisible = racquet == selectedRacquet
             }
         }
     }

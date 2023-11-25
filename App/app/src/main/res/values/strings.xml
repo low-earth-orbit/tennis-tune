@@ -33,5 +33,6 @@
     <string name="racquet_name">Racquet Name</string>
     <string name="new_racquet">New Racquet</string>
     <string name="add_edit_racquet">Add/Edit Racquet</string>
+    <string name="check_mark_content_description">Check mark for selected racquet</string>
 
 </resources>

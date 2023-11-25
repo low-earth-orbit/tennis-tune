@@ -73,7 +73,7 @@ class RacquetListActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        adapter = RacquetAdapter(this) { racquet ->
+        adapter = RacquetAdapter { racquet ->
             saveSelectedRacquetId(this, racquet.id)
         }
         recyclerView.adapter = adapter
