@@ -42,7 +42,11 @@ class RacquetAdapter(private val context: Context, private val onClick: (Racquet
 
         fun bind(racquet: Racquet) {
             racquetNameTextView.text = racquet.name
-            radioButtonSelect.isChecked = racquet == selectedRacquet
+            if (selectedRacquet == null) {
+                radioButtonSelect.isChecked = true // Pre-check the default racquet
+            } else {
+                radioButtonSelect.isChecked = racquet == selectedRacquet
+            }
         }
     }
 

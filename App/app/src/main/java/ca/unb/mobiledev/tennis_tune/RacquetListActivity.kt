@@ -40,6 +40,8 @@ class RacquetListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        setupRecyclerView()
+
         viewModel = ViewModelProvider(
             this,
             RacquetViewModelFactory(application)
@@ -66,8 +68,6 @@ class RacquetListActivity : AppCompatActivity() {
                 }
             }
         }
-
-        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
