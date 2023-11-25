@@ -166,8 +166,12 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
         if (selectedRacquetId != -1) {
             viewModel.getRacquetById(selectedRacquetId).observe(this) { racquet ->
-                racquetHeadSize = racquet.headSize
-                stringMassDensity = racquet.stringMassDensity
+                if (racquet != null) {
+                    racquetHeadSize = racquet.headSize
+                    stringMassDensity = racquet.stringMassDensity
+                } else {
+                    Log.i("MainActivity", "Racquet not found for ID: $selectedRacquetId")
+                }
             }
         }
     }

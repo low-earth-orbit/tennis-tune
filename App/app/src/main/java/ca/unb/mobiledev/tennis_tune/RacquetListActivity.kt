@@ -3,6 +3,7 @@ package ca.unb.mobiledev.tennis_tune
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -97,8 +98,24 @@ class RacquetListActivity : AppCompatActivity() {
                         .setTitle("Delete Racquet")
                         .setMessage("Are you sure you want to delete this racquet?")
                         .setPositiveButton("Delete") { dialog, which ->
+                            // Remove from db
                             viewModel.deleteRacquet(racquetToDelete)
+                            // Select the next and update view
                             adapter.selectNextAfterDeletion(racquetToDelete)
+                            // Update selectedRacquet in SharedPreferences
+                            Log.e(
+                                "RacquetListActivity", "selected racquet id from adapter = " +
+                                        adapter
+                                            .getSelectedRacquet()?.id
+                                            .toString()
+                            )
+                            adapter
+                                .getSelectedRacquet()?.id?.let {
+                                    saveSelectedRacquetId(
+                                        application.applicationContext,
+                                        it
+                                    )
+                                }
                         }
                         .setNegativeButton("Cancel") { dialog, which ->
                             adapter.notifyItemChanged(position) // Revert the swipe

@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.R
-import ca.unb.mobiledev.tennis_tune.RacquetListActivity
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
 class RacquetAdapter(private val context: Context, private val onClick: (Racquet) -> Unit) :
@@ -61,6 +60,10 @@ class RacquetAdapter(private val context: Context, private val onClick: (Racquet
         holder.bind(racquet)
     }
 
+    fun getSelectedRacquet(): Racquet? {
+        return selectedRacquet
+    }
+
     fun setSelectedRacquetById(selectedRacquetId: Int) {
         val currentList = currentList
         selectedRacquet = currentList.find { it.id == selectedRacquetId }
@@ -74,7 +77,6 @@ class RacquetAdapter(private val context: Context, private val onClick: (Racquet
         if (deletedRacquet == selectedRacquet && currentList.size > 1) {
             val newSelectedIndex = if (deletedIndex == 0) 1 else deletedIndex - 1
             selectedRacquet = currentList[newSelectedIndex]
-            RacquetListActivity.saveSelectedRacquetId(context, selectedRacquet!!.id)
         } else if (currentList.size == 1) {
             selectedRacquet = null
         }
