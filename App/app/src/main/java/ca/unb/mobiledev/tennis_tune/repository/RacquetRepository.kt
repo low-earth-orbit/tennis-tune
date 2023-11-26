@@ -25,6 +25,10 @@ class RacquetRepository(application: Application) {
         return racquetDao.getById(id)
     }
 
+    suspend fun update(racquet: Racquet) {
+        racquetDao.update(racquet)
+    }
+
     suspend fun delete(racquet: Racquet) {
         racquetDao.delete(racquet)
     }

@@ -36,5 +36,8 @@
     <string name="check_mark_content_description">Check mark for selected racquet</string>
     <string name="delete_this_racquet">Delete this racquet</string>
     <string name="edit_this_racquet">Edit this racquet</string>
+    <string name="edit_racquet">Edit Racquet</string>
+    <string name="add_racquet">Add Racquet</string>
+    <string name="add">Add</string>
 
 </resources>

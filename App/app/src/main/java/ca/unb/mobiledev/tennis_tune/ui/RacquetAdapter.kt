@@ -2,6 +2,7 @@ package ca.unb.mobiledev.tennis_tune.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import ca.unb.mobiledev.tennis_tune.AddEditRacquetActivity
 import ca.unb.mobiledev.tennis_tune.R
 import ca.unb.mobiledev.tennis_tune.RacquetListActivity
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
@@ -75,8 +77,11 @@ class RacquetAdapter(
             editButton.setOnClickListener() {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    val racquetToEidt = getItem(position)
-
+                    val racquetToEdit = getItem(position)
+                    val intent = Intent(context, AddEditRacquetActivity::class.java).apply {
+                        putExtra("EXTRA_RACQUET_ID", racquetToEdit.id)
+                    }
+                    context.startActivity(intent)
                 }
             }
 

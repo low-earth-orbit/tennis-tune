@@ -22,10 +22,14 @@ class RacquetViewModel(application: Application) : AndroidViewModel(application)
         repository.insert(racquet)
     }
 
+    fun update(racquet: Racquet) = viewModelScope.launch {
+        repository.update(racquet)
+    }
+
     fun getRacquetById(id: Int): LiveData<Racquet> {
         return repository.getRacquetById(id)
     }
-    
+
     fun deleteRacquet(racquet: Racquet) = viewModelScope.launch {
         if (allRacquets.value.orEmpty().size > 1) {
             repository.delete(racquet)
