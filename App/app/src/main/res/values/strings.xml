@@ -39,5 +39,7 @@
     <string name="edit_racquet">Edit Racquet</string>
     <string name="add_racquet">Add Racquet</string>
     <string name="add">Add</string>
+    <string name="info_changed">Racquet info changed</string>
+    <string name="racquet_name_cannot_be_empty">Racquet name cannot be empty</string>
 
 </resources>

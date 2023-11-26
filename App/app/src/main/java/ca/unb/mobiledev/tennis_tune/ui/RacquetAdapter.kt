@@ -74,7 +74,7 @@ class RacquetAdapter(
             }
 
             // Edit racquet
-            editButton.setOnClickListener() {
+            editButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val racquetToEdit = getItem(position)
