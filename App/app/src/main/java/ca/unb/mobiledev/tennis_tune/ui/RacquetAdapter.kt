@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,7 +25,7 @@ class RacquetAdapter(
     private var selectedRacquet: Racquet? = null
 
     inner class RacquetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val deleteButton = itemView.findViewById<Button>(R.id.deleteButton)
+        private val deleteButton = itemView.findViewById<ImageView>(R.id.deleteButton)
         private val racquetNameTextView: TextView =
             itemView.findViewById(R.id.racquet_list_item_racquet_name)
         private val racquetListItemCheck: ImageView =

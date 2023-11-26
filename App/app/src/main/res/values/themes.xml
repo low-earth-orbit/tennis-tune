@@ -22,10 +22,4 @@
     <style name="Theme.Tennis_tune.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Tennis_tune.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="DeleteButton" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@android:color/holo_red_light</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-
 </resources>
