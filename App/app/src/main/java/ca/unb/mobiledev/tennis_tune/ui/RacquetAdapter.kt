@@ -1,30 +1,73 @@
 package ca.unb.mobiledev.tennis_tune.ui
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.R
+import ca.unb.mobiledev.tennis_tune.RacquetListActivity
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
-class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
-    ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
+class RacquetAdapter(
+    private val context: Context,
+    private val viewModel: RacquetViewModel,
+    private val onClick: (Racquet) -> Unit
+) : ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
     private var selectedRacquet: Racquet? = null
 
-    inner class RacquetViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class RacquetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val deleteButton = itemView.findViewById<Button>(R.id.deleteButton)
         private val racquetNameTextView: TextView =
             itemView.findViewById(R.id.racquet_list_item_racquet_name)
         private val racquetListItemCheck: ImageView =
             itemView.findViewById(R.id.racquet_list_item_check)
+        private val racquetListItem: FrameLayout = itemView.findViewById(R.id.racquetListItem)
 
         init {
-            itemView.setOnClickListener {
+            deleteButton.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val racquetToDelete = getItem(position)
+                    if (currentList.size > 1) {
+                        AlertDialog.Builder(context)
+                            .setTitle("Delete Racquet")
+                            .setMessage("Are you sure you want to delete this racquet?")
+                            .setPositiveButton("Delete") { _, _ ->
+                                // Delete operation
+                                viewModel.deleteRacquet(racquetToDelete)
+                                // Select the next
+                                selectNextAfterDeletion(racquetToDelete)
+                                // Update SharedPreferences
+                                getSelectedRacquet()?.id?.let {
+                                    RacquetListActivity.saveSelectedRacquetId(context, it)
+                                }
+                            }
+                            .setNegativeButton("Cancel") { _, _ ->
+                            }
+                            .setOnCancelListener {
+                            }
+                            .show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Cannot delete the last racquet",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
+            racquetListItem.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val newSelectedRacquet = getItem(position)
@@ -78,8 +121,6 @@ class RacquetAdapter(private val onClick: (Racquet) -> Unit) :
         if (deletedRacquet == selectedRacquet && currentList.size > 1) {
             val newSelectedIndex = if (deletedIndex == 0) 1 else deletedIndex - 1
             selectedRacquet = currentList[newSelectedIndex]
-        } else if (currentList.size == 1) {
-            selectedRacquet = null
         }
         notifyDataSetChanged()
     }

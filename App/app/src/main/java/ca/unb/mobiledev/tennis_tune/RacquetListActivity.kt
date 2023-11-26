@@ -3,13 +3,9 @@ package ca.unb.mobiledev.tennis_tune
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.unb.mobiledev.tennis_tune.databinding.RacquetListBinding
@@ -41,8 +37,6 @@ class RacquetListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        setupRecyclerView()
-
         viewModel = ViewModelProvider(
             this,
             RacquetViewModelFactory(application)
@@ -69,74 +63,17 @@ class RacquetListActivity : AppCompatActivity() {
                 }
             }
         }
+
+        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
         val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        adapter = RacquetAdapter { racquet ->
+        adapter = RacquetAdapter(this, viewModel) { racquet ->
             saveSelectedRacquetId(this, racquet.id)
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-
-        val itemTouchHelperCallback = object :
-            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false // Not moving items up/down
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val racquetToDelete = adapter.currentList[position]
-
-                if (currentRacquets.size > 1) {
-                    AlertDialog.Builder(this@RacquetListActivity)
-                        .setTitle("Delete Racquet")
-                        .setMessage("Are you sure you want to delete this racquet?")
-                        .setPositiveButton("Delete") { dialog, which ->
-                            // Remove from db
-                            viewModel.deleteRacquet(racquetToDelete)
-                            // Select the next and update view
-                            adapter.selectNextAfterDeletion(racquetToDelete)
-                            // Update selectedRacquet in SharedPreferences
-                            Log.e(
-                                "RacquetListActivity", "selected racquet id from adapter = " +
-                                        adapter
-                                            .getSelectedRacquet()?.id
-                                            .toString()
-                            )
-                            adapter
-                                .getSelectedRacquet()?.id?.let {
-                                    saveSelectedRacquetId(
-                                        application.applicationContext,
-                                        it
-                                    )
-                                }
-                        }
-                        .setNegativeButton("Cancel") { dialog, which ->
-                            adapter.notifyItemChanged(position) // Revert the swipe
-                        }
-                        .setOnCancelListener {
-                            adapter.notifyItemChanged(position) // Revert the swipe if cancelled
-                        }
-                        .show()
-                } else {
-                    Toast.makeText(
-                        this@RacquetListActivity,
-                        "Cannot delete the last racquet",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    adapter.notifyItemChanged(position) // Undo the swipe
-                }
-            }
-        }
-
-        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
