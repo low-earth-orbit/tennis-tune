@@ -169,6 +169,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                 if (racquet != null) {
                     racquetHeadSize = racquet.headSize
                     stringMassDensity = racquet.stringMassDensity
+                    supportActionBar?.title = racquet.name
                 } else {
                     Log.i("MainActivity", "Racquet not found for ID: $selectedRacquetId")
                 }

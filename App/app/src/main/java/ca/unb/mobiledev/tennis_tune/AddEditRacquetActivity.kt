@@ -135,18 +135,14 @@ class AddEditRacquetActivity : AppCompatActivity() {
         val stringMassDensity =
             binding.editRacquetStringMassDensity.text.toString().toDoubleOrNull()
 
-        if (headSize != null && stringMassDensity != null) {
-            if (racquetId == null) {
-                val newRacquet = Racquet(0, racquetName, headSize, stringMassDensity)
-                viewModel.insert(newRacquet)
-            } else {
-                val racquetToUpdate = Racquet(racquetId!!, racquetName, headSize, stringMassDensity)
-                viewModel.update(racquetToUpdate)
-            }
-            finish() // Close the activity after saving
+        val racquet = Racquet(racquetId ?: 0, racquetName, headSize!!, stringMassDensity!!)
+
+        if (racquetId == null) {
+            viewModel.insert(racquet)
         } else {
-            // Show an error message or handle input validation
+            viewModel.update(racquet)
         }
+        finish() // Close the activity after saving
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
