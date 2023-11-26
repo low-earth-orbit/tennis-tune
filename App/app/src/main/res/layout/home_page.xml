@@ -114,6 +114,7 @@
                     android:id="@+id/racquetsButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
+                    android:layout_margin="4dp"
                     android:contentDescription="@string/racquets_button_description"
                     android:fadingEdge="horizontal|vertical"
                     android:src="@drawable/tennis_racquet_icon" />
@@ -122,6 +123,7 @@
                     android:id="@+id/settingsButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
+                    android:layout_margin="4dp"
                     android:contentDescription="@string/settings_button_description"
                     android:fadingEdge="horizontal|vertical"
                     android:src="@drawable/baseline_settings_24" />
