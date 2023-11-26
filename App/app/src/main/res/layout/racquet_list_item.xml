@@ -65,6 +65,9 @@
                 android:layout_marginStart="48dp"
                 android:layout_marginEnd="16dp"
                 android:gravity="center|start"
+                app:autoSizeMaxTextSize="48sp"
+                app:autoSizeMinTextSize="8sp"
+                app:autoSizeStepGranularity="2sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

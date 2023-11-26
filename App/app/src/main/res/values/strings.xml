@@ -5,7 +5,6 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-
     <string name="text_detecting">Listening…</string>
     <string name="button_reset">Reset</string>
     <string name="title_settings_page">Settings</string>
@@ -19,7 +18,7 @@
     <string name="string_mass_density">1.53</string>
     <string name="radio_button_kg">kg</string>
     <string name="radio_button_lb">lb</string>
-    <string name="title_home_page">Home</string>
+    <string name="title_home_page">TennisTune</string>
     <string name="invalid_inputs">Invalid inputs</string>
     <string name="string_mass_density_accepted_range">Accepted range: 0.5 – 3.0</string>
     <string name="supported_head_size">Supported range: 85 – 130</string>
@@ -41,5 +40,7 @@
     <string name="add">Add</string>
     <string name="info_changed">Racquet info changed</string>
     <string name="racquet_name_cannot_be_empty">Racquet name cannot be empty</string>
-
+    <string name="reset_audio_detection">Reset audio detection</string>
+    <string name="settings_button_description">Open Settings page</string>
+    <string name="racquets_button_description">Open Racquets page</string>
 </resources>

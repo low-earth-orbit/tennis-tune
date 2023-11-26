@@ -10,7 +10,6 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -106,31 +105,15 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             resetFrequencyText()
         }
 
-        val racquetsButton = Button(this).apply {
-            text = getString(R.string.racquets)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            setOnClickListener {
-                val intent = Intent(this@MainActivity, RacquetListActivity::class.java)
-                startActivity(intent)
-            }
+        binding.racquetsButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, RacquetListActivity::class.java)
+            startActivity(intent)
         }
-        binding.bottomMenu.addView(racquetsButton)
 
-        val settingsButton = Button(this).apply {
-            text = getString(R.string.button_settings)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            setOnClickListener {
-                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-                startActivity(intent)
-            }
+        binding.settingsButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(intent)
         }
-        binding.bottomMenu.addView(settingsButton)
     }
 
     @SuppressLint("MissingPermission")
@@ -169,7 +152,6 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
                 if (racquet != null) {
                     racquetHeadSize = racquet.headSize
                     stringMassDensity = racquet.stringMassDensity
-                    supportActionBar?.title = racquet.name
                 } else {
                     Log.i("MainActivity", "Racquet not found for ID: $selectedRacquetId")
                 }
@@ -190,7 +172,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
             ViewGroup.LayoutParams.MATCH_PARENT,
             (this.visualizerHeightDip * resources.displayMetrics.density).toInt()
         )
-        val visualizerContainer = findViewById<LinearLayout>(R.id.my_visualizer_container)
+        val visualizerContainer = findViewById<LinearLayout>(R.id.visualizer_container)
         visualizerContainer?.addView(mVisualizerView)
     }
 

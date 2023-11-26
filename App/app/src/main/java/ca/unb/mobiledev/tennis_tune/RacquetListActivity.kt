@@ -20,6 +20,8 @@ class RacquetListActivity : AppCompatActivity() {
     private lateinit var adapter: RacquetAdapter
     private lateinit var viewModel: RacquetViewModel
     private var currentRacquets: List<Racquet> = emptyList()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +39,24 @@ class RacquetListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        recyclerView = binding.racquetsRecyclerView
+
         viewModel = ViewModelProvider(
             this,
             RacquetViewModelFactory(application)
         )[RacquetViewModel::class.java]
+
+        adapter = RacquetAdapter(this, viewModel) { racquet ->
+            saveSelectedRacquetId(this, racquet.id)
+        }
+
+        layoutManager = LinearLayoutManager(this)
+
+        setupRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         viewModel.allRacquets.observe(this) { racquets ->
             racquets?.let {
@@ -63,17 +79,11 @@ class RacquetListActivity : AppCompatActivity() {
                 }
             }
         }
-
-        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
-        val recyclerView: RecyclerView = findViewById(R.id.racquets_recycler_view)
-        adapter = RacquetAdapter(this, viewModel) { racquet ->
-            saveSelectedRacquetId(this, racquet.id)
-        }
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -107,10 +107,8 @@ class RacquetAdapter(
             racquetNameTextView.text = racquet.name
 
             // Set check mark visibility
-            if (selectedRacquet == null) {
-                racquetListItemCheck.isVisible = true // Pre-check the default racquet
-            } else {
-                racquetListItemCheck.isVisible = racquet == selectedRacquet
+            if (selectedRacquet != null) {
+                racquetListItemCheck.isVisible = racquet.id == selectedRacquet!!.id
             }
         }
     }
