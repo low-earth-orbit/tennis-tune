@@ -26,6 +26,7 @@ class RacquetAdapter(
 
     inner class RacquetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val deleteButton = itemView.findViewById<ImageView>(R.id.deleteButton)
+        private val editButton = itemView.findViewById<ImageView>(R.id.editButton)
         private val racquetNameTextView: TextView =
             itemView.findViewById(R.id.racquet_list_item_racquet_name)
         private val racquetListItemCheck: ImageView =
@@ -33,6 +34,7 @@ class RacquetAdapter(
         private val racquetListItem: FrameLayout = itemView.findViewById(R.id.racquetListItem)
 
         init {
+            // Delete racquet
             deleteButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -40,7 +42,10 @@ class RacquetAdapter(
                     if (currentList.size > 1) {
                         AlertDialog.Builder(context)
                             .setTitle("Delete Racquet")
-                            .setMessage("Are you sure you want to delete this racquet?")
+                            .setMessage(
+                                "This cannot be undone. Are you sure you want to delete " +
+                                        "this racquet?"
+                            )
                             .setPositiveButton("Delete") { _, _ ->
                                 // Delete operation
                                 viewModel.deleteRacquet(racquetToDelete)
@@ -66,6 +71,16 @@ class RacquetAdapter(
                 }
             }
 
+            // Edit racquet
+            editButton.setOnClickListener() {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val racquetToEidt = getItem(position)
+
+                }
+            }
+
+            // Select racquet
             racquetListItem.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -83,7 +98,10 @@ class RacquetAdapter(
         }
 
         fun bind(racquet: Racquet) {
+            // Display racquet name
             racquetNameTextView.text = racquet.name
+
+            // Set check mark visibility
             if (selectedRacquet == null) {
                 racquetListItemCheck.isVisible = true // Pre-check the default racquet
             } else {
