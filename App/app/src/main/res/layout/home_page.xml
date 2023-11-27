@@ -117,6 +117,7 @@
                     android:layout_margin="4dp"
                     android:contentDescription="@string/racquets_button_description"
                     android:fadingEdge="horizontal|vertical"
+                    android:padding="4dp"
                     android:src="@drawable/tennis_racquet_icon" />
 
                 <ImageView
