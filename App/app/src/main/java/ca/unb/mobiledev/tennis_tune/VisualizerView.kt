@@ -42,8 +42,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     var displayFrequencyListener: OnDisplayFrequencyChangeListener? = null
 
     init {
-        //#FF6200EE
-        paint.color = Color.argb(255, 0, 255, 0)
+        paint.color = Color.argb(200, 181, 111, 233)
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
     }

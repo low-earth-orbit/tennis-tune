@@ -3,21 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".AddEditRacquetActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black_light"
         android:theme="@style/Theme.Tennis_tune.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/top_bar_settings"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/black_light"
+            android:background="?attr/colorPrimary"
             app:popupTheme="@style/Theme.Tennis_tune.PopupOverlay"
             app:title="@string/add_edit_racquet" />
 
@@ -43,8 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:labelFor="@+id/edit_racquet_racquet_name"
-                android:text="@string/racquet_name"
-                android:textColor="@color/grey_light" />
+                android:text="@string/racquet_name" />
 
             <EditText
                 android:id="@+id/edit_racquet_racquet_name"
@@ -54,8 +51,7 @@
                 android:autofillHints="racquetName"
                 android:inputType="text"
                 android:maxWidth="400dp"
-                android:text="@string/new_racquet"
-                android:textColor="@color/grey_light" />
+                android:text="@string/new_racquet" />
 
             <!-- Racquet Head Size Input -->
             <TextView
@@ -63,8 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:labelFor="@+id/edit_racquet_racquet_head_size"
-                android:text="@string/racquet_head_size_sq_in_label"
-                android:textColor="@color/grey_light" />
+                android:text="@string/racquet_head_size_sq_in_label" />
 
             <EditText
                 android:id="@+id/edit_racquet_racquet_head_size"
@@ -74,8 +69,7 @@
                 android:autofillHints="headSize"
                 android:inputType="number|numberDecimal"
                 android:maxWidth="200dp"
-                android:text="@string/racquet_head_size_100"
-                android:textColor="@color/grey_light" />
+                android:text="@string/racquet_head_size_100" />
 
             <!-- String Mass Density Input -->
             <TextView
@@ -83,8 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:labelFor="@+id/edit_racquet_string_mass_density"
-                android:text="@string/string_mass_density_g_m_label"
-                android:textColor="@color/grey_light" />
+                android:text="@string/string_mass_density_g_m_label" />
 
             <EditText
                 android:id="@+id/edit_racquet_string_mass_density"
@@ -94,8 +87,7 @@
                 android:autofillHints="stringMassDensity"
                 android:inputType="number|numberDecimal"
                 android:maxWidth="200dp"
-                android:text="@string/string_mass_density"
-                android:textColor="@color/grey_light" />
+                android:text="@string/string_mass_density" />
 
             <Button
                 android:id="@+id/edit_racquet_button_save"
@@ -103,8 +95,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/button_save"
-                android:textColor="@color/black"
-                android:backgroundTint="@color/grey_light"
                 app:layout_anchor="@id/appBarLayout"
                 app:layout_anchorGravity="bottom|start" />
         </LinearLayout>

@@ -4,23 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".RacquetListActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black_light"
         android:theme="@style/Theme.Tennis_tune.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/top_bar_settings"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/black_light"
+            android:background="?attr/colorPrimary"
             app:popupTheme="@style/Theme.Tennis_tune.PopupOverlay"
-            app:title="@string/racquets"/>
+            app:title="@string/racquets" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,8 +26,7 @@
         android:id="@+id/racquets_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:backgroundTintMode="add" />
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_racquet"
@@ -40,7 +37,6 @@
         android:clickable="true"
         android:contentDescription="@string/add_a_new_racquet"
         android:focusable="true"
-        app:backgroundTint="@color/grey_light"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
