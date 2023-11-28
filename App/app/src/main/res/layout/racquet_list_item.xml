@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    swipe:dragEdge="right"
+    swipe:mode="normal">
+
+    <!-- Layout that will be shown when swiped -->
+    <LinearLayout
+        android:layout_width="128dp"
+        android:layout_height="64dp"
+        android:layout_gravity="start"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/editButton"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_orange_dark"
+            android:contentDescription="@string/edit_this_racquet"
+            android:padding="16dp"
+            android:src="@drawable/baseline_edit_24" />
+
+        <ImageView
+            android:id="@+id/deleteButton"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_red_dark"
+            android:contentDescription="@string/delete_this_racquet"
+            android:padding="16dp"
+            android:src="@drawable/baseline_delete_24" />
+    </LinearLayout>
+
+    <!-- Main layout of the list item -->
+    <FrameLayout
+        android:id="@+id/racquetListItem"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@android:color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/racquet_list_item_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/check_mark_content_description"
+                android:src="@drawable/outline_check_24"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/racquet_list_item_racquet_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="48dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center|start"
+                app:autoSizeMaxTextSize="48sp"
+                app:autoSizeMinTextSize="8sp"
+                app:autoSizeStepGranularity="2sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</com.chauthai.swipereveallayout.SwipeRevealLayout>

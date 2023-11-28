@@ -92,7 +92,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
         super.onDraw(canvas)
 
         if (isAudioInputAvailable && magnitudes.isNotEmpty()) {
-            val numberOfBars = 20
+            val numberOfBars = 12
             val step = magnitudes.size / numberOfBars
             val barWidth =
                 width / (2 * numberOfBars).toFloat() // Each "slot" (bar + gap) is twice the bar width

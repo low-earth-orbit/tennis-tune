@@ -10,6 +10,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        //noinspection Keep it for SwipeRevealLayout
+        jcenter()
     }
 }
 

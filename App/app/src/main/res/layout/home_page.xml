@@ -7,7 +7,6 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <!-- AppBarLayout with Toolbar for the app bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +26,6 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:fillViewport="true">
 
-        <!-- Content Layout -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
@@ -52,7 +50,7 @@
                 app:autoSizeTextType="uniform"
                 app:layout_constraintBottom_toTopOf="@+id/unitTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.4"
+                app:layout_constraintHeight_percent="0.3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -70,14 +68,14 @@
                 app:autoSizeMaxTextSize="34sp"
                 app:autoSizeMinTextSize="8sp"
                 app:autoSizeStepGranularity="2sp"
-                app:layout_constraintBottom_toTopOf="@+id/my_visualizer_container"
+                app:layout_constraintBottom_toTopOf="@+id/visualizer_container"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tensionTextView" />
 
             <LinearLayout
-                android:id="@+id/my_visualizer_container"
+                android:id="@+id/visualizer_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:elevation="2dp"
@@ -90,29 +88,47 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/unitTextView" />
 
-            <Button
+            <ImageView
                 android:id="@+id/resetButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="@string/button_reset"
-                android:textColor="#E1BEE7"
-                app:layout_constraintBottom_toTopOf="@+id/bottomMenu"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_margin="16dp"
+                android:contentDescription="@string/reset_audio_detection"
+                android:src="@drawable/baseline_restart_alt_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/my_visualizer_container" />
+                app:layout_constraintTop_toBottomOf="@+id/visualizer_container" />
 
             <LinearLayout
-                android:id="@+id/bottomMenu"
+                android:id="@+id/buttonContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_margin="16dp"
                 android:orientation="horizontal"
-                android:padding="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/resetButton" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/resetButton">
+
+                <ImageView
+                    android:id="@+id/racquetsButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="4dp"
+                    android:contentDescription="@string/racquets_button_description"
+                    android:fadingEdge="horizontal|vertical"
+                    android:padding="4dp"
+                    android:src="@drawable/tennis_racquet_icon" />
+
+                <ImageView
+                    android:id="@+id/settingsButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="4dp"
+                    android:contentDescription="@string/settings_button_description"
+                    android:fadingEdge="horizontal|vertical"
+                    android:src="@drawable/baseline_settings_24" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

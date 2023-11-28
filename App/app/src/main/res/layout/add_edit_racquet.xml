@@ -1,0 +1,102 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddEditRacquetActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.Tennis_tune.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/top_bar_settings"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.Tennis_tune.PopupOverlay"
+            app:title="@string/add_edit_racquet" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_anchor="@id/appBarLayout"
+            app:layout_anchorGravity="bottom|center">
+
+            <!-- Racquet Name Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/edit_racquet_racquet_name"
+                android:text="@string/racquet_name" />
+
+            <EditText
+                android:id="@+id/edit_racquet_racquet_name"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="racquetName"
+                android:inputType="text"
+                android:maxWidth="400dp"
+                android:text="@string/new_racquet" />
+
+            <!-- Racquet Head Size Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/edit_racquet_racquet_head_size"
+                android:text="@string/racquet_head_size_sq_in_label" />
+
+            <EditText
+                android:id="@+id/edit_racquet_racquet_head_size"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="headSize"
+                android:inputType="number|numberDecimal"
+                android:maxWidth="200dp"
+                android:text="@string/racquet_head_size_100" />
+
+            <!-- String Mass Density Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:labelFor="@+id/edit_racquet_string_mass_density"
+                android:text="@string/string_mass_density_g_m_label" />
+
+            <EditText
+                android:id="@+id/edit_racquet_string_mass_density"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="stringMassDensity"
+                android:inputType="number|numberDecimal"
+                android:maxWidth="200dp"
+                android:text="@string/string_mass_density" />
+
+            <Button
+                android:id="@+id/edit_racquet_button_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/button_save"
+                app:layout_anchor="@id/appBarLayout"
+                app:layout_anchorGravity="bottom|start" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
