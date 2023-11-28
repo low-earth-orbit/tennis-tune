@@ -9,6 +9,12 @@ Welcome to the GitHub repository for the Tennis Racquet Tension App! This applic
 - **Edit racquet:** The head size & string density.
 - **Change units:** Switch between Lbs and Kgs.
 
+<<<<<<< Updated upstream
+=======
+## How the tension is measured
+This is how the tension is measured.
+
+>>>>>>> Stashed changes
 ## To install the Tennis Racquet Tension App, follow these steps:
 Clone the repository:
 `git clone https://github.com/low-earth-orbit/tennis-tune.git`
@@ -19,6 +25,15 @@ Then open it in Android Studio
 ## Usage
 After installation, you can run the app by running it in Android Studio either from your own device or an emulator. 
 
+<<<<<<< Updated upstream
+=======
+## Supported Devices
+Up to Android 33 with a minimum of Android 24.
+
+## Roadmap
+Our Roadmap goes here.
+
+>>>>>>> Stashed changes
 ## Contributing
 We welcome contributions to the Tennis Racquet Tension App! If you're interested in contributing, please read our CONTRIBUTING.md file for guidelines on how to get started.
 
