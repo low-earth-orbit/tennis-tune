@@ -40,7 +40,7 @@
         android:id="@+id/racquetListItem"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:background="@android:color/white">
+        android:background="?attr/backgroundColor">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -65,6 +65,7 @@
                 android:layout_marginStart="48dp"
                 android:layout_marginEnd="16dp"
                 android:gravity="center|start"
+                android:textColor="?attr/colorOnBackground"
                 app:autoSizeMaxTextSize="48sp"
                 app:autoSizeMinTextSize="8sp"
                 app:autoSizeStepGranularity="2sp"
