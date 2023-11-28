@@ -1,44 +1,25 @@
-# Tennis Racquet Tension App
+# TennisTune
 
-## Introduction
-Welcome to the GitHub repository for the Tennis Racquet Tension App! This application is designed for tennis players and enthusiasts who want to optimize their playing experience by adjusting the string tension of their racquets. This was a project for CS2063.
+Welcome to the GitHub repository for TennisTune! This application is designed for tennis players and enthusiasts who want to optimize their playing experience by tracking the string tension of their racquets.
 
 ## Features
-- **Measure Tension:** Measure the tension of your racquet. 
-- **Racquet List:** Have multiple racquets? Create and manage racquets to track different racquets and tension preferences.
-- **Edit racquet:** The head size & string density.
-- **Change units:** Switch between Lbs and Kgs.
+- **Tension measurement** Measure the string tension of your tennis racquet.
+- **Racquet management** Have multiple racquets? Create and manage racquets to track them all.
+- **Racquet customization** You can customize the head size & string mass density for tension calculation.
+- **Display units** Switch between lb and kg.
 
-<<<<<<< Updated upstream
-=======
-## How the tension is measured
-This is how the tension is measured.
-
->>>>>>> Stashed changes
-## To install the Tennis Racquet Tension App, follow these steps:
-Clone the repository:
-`git clone https://github.com/low-earth-orbit/tennis-tune.git`
-Navigate to the app directory:
-`cd tennis-tune`
-Then open it in Android Studio
+## How tension is measured
+The tension is calculated based on the audio frequency by tapping on the string bed. We invite you to visit the project's wiki pages for detailed algorithms.
 
 ## Usage
-After installation, you can run the app by running it in Android Studio either from your own device or an emulator. 
+1. Remove dampener from the string bed, if you use one.
+2. Hold the tennis racquet at the throat. Do not touch the string bed.
+3. Use a firm object (such as a spoon or a screwdriver) to repeatedly tap on the string bed.
+4. The app will listen to the sound and display the tension.
+5. Click the reset button to restart.
+6. Customize your racquet specs (head size and string mass density) to get a more accurate result.
 
-<<<<<<< Updated upstream
-=======
-## Supported Devices
-Up to Android 33 with a minimum of Android 24.
-
-## Roadmap
-Our Roadmap goes here.
-
->>>>>>> Stashed changes
-## Contributing
-We welcome contributions to the Tennis Racquet Tension App! If you're interested in contributing, please read our CONTRIBUTING.md file for guidelines on how to get started.
-
-## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
-
-## Contact
-For any questions or feedback, please contact Hong (Leo) Hang, Tobias Hauser, Spencer Walton at leo.hong@unb.ca, tobias.hauser@unb.ca, swalton1@unb.ca
+## Supported devices
+- Android 24+
+- Tested on phones
+- Not optimized for wear devices and desktops/tablets
