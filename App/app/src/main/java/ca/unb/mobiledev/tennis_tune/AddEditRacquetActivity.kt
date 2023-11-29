@@ -91,8 +91,8 @@ class AddEditRacquetActivity : AppCompatActivity() {
 
         binding.editRacquetRacquetHeadSize.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
-                val headSize = s.toString().toDoubleOrNull()
-                if (headSize == null || !isValidHeadSize(headSize)) {
+                val headSize = s.toString().toIntOrNull()
+                if (headSize == null || !isValidHeadSize(headSize.toInt())) {
                     headSizeView.error = getString(R.string.supported_head_size)
                 }
             }
@@ -119,11 +119,11 @@ class AddEditRacquetActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.edit_racquet)
         binding.editRacquetButtonSave.text = getString(R.string.button_save)
         binding.editRacquetRacquetName.setText(racquet.name)
-        binding.editRacquetRacquetHeadSize.setText(racquet.headSize.toString())
+        binding.editRacquetRacquetHeadSize.setText(racquet.headSize.toInt().toString())
         binding.editRacquetStringMassDensity.setText(racquet.stringMassDensity.toString())
 
         originalRacquetName = racquet.name
-        originalRacquetHeadSize = racquet.headSize.toString()
+        originalRacquetHeadSize = racquet.headSize.toInt().toString()
         originalStringMassDensity = racquet.stringMassDensity.toString()
         updateSaveButtonState()
     }
@@ -131,11 +131,12 @@ class AddEditRacquetActivity : AppCompatActivity() {
     private fun saveRacquet() {
         val racquetName = binding.editRacquetRacquetName.text.toString()
         val headSize =
-            binding.editRacquetRacquetHeadSize.text.toString().toDoubleOrNull()
+            binding.editRacquetRacquetHeadSize.text.toString().toIntOrNull()
         val stringMassDensity =
             binding.editRacquetStringMassDensity.text.toString().toDoubleOrNull()
 
-        val racquet = Racquet(racquetId ?: 0, racquetName, headSize!!, stringMassDensity!!)
+        val racquet =
+            Racquet(racquetId ?: 0, racquetName, headSize!!.toDouble(), stringMassDensity!!)
 
         if (racquetId == null) {
             viewModel.insert(racquet)
@@ -165,7 +166,7 @@ class AddEditRacquetActivity : AppCompatActivity() {
 
     private fun isInputValid(): Boolean {
         val racquetName = binding.editRacquetRacquetName.text.toString()
-        val headSize = binding.editRacquetRacquetHeadSize.text.toString().toDoubleOrNull()
+        val headSize = binding.editRacquetRacquetHeadSize.text.toString().toIntOrNull()
         val stringDensity = binding.editRacquetStringMassDensity.text.toString().toDoubleOrNull()
 
         return when {
@@ -190,8 +191,8 @@ class AddEditRacquetActivity : AppCompatActivity() {
         }
     }
 
-    private fun isValidHeadSize(size: Double): Boolean {
-        return size in 85.0..130.0
+    private fun isValidHeadSize(size: Int?): Boolean {
+        return size in 85..130
     }
 
     private fun isValidStringMassDensity(density: Double): Boolean {
@@ -200,8 +201,10 @@ class AddEditRacquetActivity : AppCompatActivity() {
 
     private fun hasUnsavedChanges(): Boolean {
         val currentRacquetName = binding.editRacquetRacquetName.text.toString()
-        val currentRacquetHeadSize = binding.editRacquetRacquetHeadSize.text.toString()
-        val currentStringMassDensity = binding.editRacquetStringMassDensity.text.toString()
+        val currentRacquetHeadSize =
+            binding.editRacquetRacquetHeadSize.text.toString().toIntOrNull().toString()
+        val currentStringMassDensity =
+            binding.editRacquetStringMassDensity.text.toString()
 
         return currentRacquetName != originalRacquetName ||
                 currentRacquetHeadSize != originalRacquetHeadSize ||
