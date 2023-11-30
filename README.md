@@ -4,11 +4,11 @@ Welcome to the GitHub repository for TennisTune! This application is designed fo
 
 ## Features
 
-- **Tension measurement** Measure the string tension of your tennis racquet.
-- **Racquet management** Have multiple racquets? Create and manage racquets to track them all.
-- **Racquet customization** You can customize the head size & string mass density for tension calculation.
-- **Display units** Switch between lb and kg.
-- **Dark theme** The app supports both light and dark themes depending on the phone's setting.
+- **Tension measurement:** Measure the string tension of your tennis racquet.
+- **Racquet management:** Have multiple racquets? Create and manage racquets to track them all.
+- **Racquet customization:** You can customize the head size & string mass density for tension calculation.
+- **Display units:** Switch between lb and kg.
+- **Dark theme:** The app supports both light and dark themes depending on the phone's setting.
 
 ## Screenshots
 
