@@ -31,7 +31,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private var frequencyWindow = mutableListOf<Float>()
     private val frequencyWindowSize =
         60  // Use a rolling window of frequencies
-    private val frequencyWindowMaxStdDev = 5f
+    private val frequencyWindowMaxStdDev = 1f
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
     private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
