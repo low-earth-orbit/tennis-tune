@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         super.onPause()
 
         // Reset frequency text
-        resetFrequencyText()
+        resetTensionText()
 
         // Stop the recording and release resources
         stopAudioCapture()
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         unitTextView = binding.unitTextView
 
         binding.resetButton.setOnClickListener {
-            resetFrequencyText()
+            resetTensionText()
         }
 
         binding.racquetsButton.setOnClickListener {
@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
         }
     }
 
-    private fun resetFrequencyText() {
+    private fun resetTensionText() {
         mVisualizerView?.resetFrequencies()
         tensionTextView?.text = this.getString(R.string.text_detecting)
         unitTextView?.text = ""
