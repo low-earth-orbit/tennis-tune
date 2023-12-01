@@ -232,9 +232,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     }
 
     override fun onDisplayFrequencyChange(frequency: Float) {
-        Log.d("MainActivity", "Display Frequency: $frequency")
-        Log.d("MainActivity", "racquetHeadSize: $racquetHeadSize")
-        Log.d("MainActivity", "stringMassDensity: $stringMassDensity")
+        Log.i("MainActivity", "Display Frequency: $frequency")
 
         val tensionLb =
             frequencyToTension(frequency, racquetHeadSize, stringMassDensity)
