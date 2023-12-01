@@ -34,9 +34,9 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
     private var unitTextView: TextView? = null
 
     // Parameters for tension calculation
-    private var displayUnit: String? = null
-    private var racquetHeadSize: Double? = null
-    private var stringMassDensity: Double? = null
+    private var displayUnit: String = "lb"
+    private var racquetHeadSize: Double = 100.0
+    private var stringMassDensity: Double = 1.53
 
     // Audio processing
     private lateinit var audioRecord: AudioRecord
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     private fun loadSettings() {
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
-        displayUnit = sharedPreferences.getString("DISPLAY_UNIT", "lb")
+        displayUnit = sharedPreferences.getString("DISPLAY_UNIT", "lb")!!
     }
 
     private fun loadSelectedRacquetDetails() {
@@ -233,30 +233,27 @@ class MainActivity : AppCompatActivity(), VisualizerView.OnDisplayFrequencyChang
 
     override fun onDisplayFrequencyChange(frequency: Float) {
         Log.d("MainActivity", "Display Frequency: $frequency")
+        Log.d("MainActivity", "racquetHeadSize: $racquetHeadSize")
+        Log.d("MainActivity", "stringMassDensity: $stringMassDensity")
 
-        if (racquetHeadSize != null && stringMassDensity != null) {
-            val tensionLb = frequencyToTension(frequency, racquetHeadSize!!, stringMassDensity!!)
-            val tensionDisplay = if (displayUnit == "kg") {
-                val tensionKg = tensionLb * 0.45359237
-                "%.1f".format(tensionKg)
-            } else {
-                "%.1f".format(tensionLb)
-            }
+        val tensionLb =
+            frequencyToTension(frequency, racquetHeadSize, stringMassDensity)
+        val tensionDisplay = if (displayUnit == "kg") {
+            val tensionKg = tensionLb * 0.45359237
+            "%.1f".format(tensionKg)
+        } else {
+            "%.1f".format(tensionLb)
+        }
 
-            val unitDisplay = if (displayUnit == "kg") {
-                "kg"
-            } else {
-                "lb"
-            }
+        val unitDisplay = if (displayUnit == "kg") {
+            "kg"
+        } else {
+            "lb"
+        }
 
-            runOnUiThread {
-                tensionTextView?.text = buildString {
-                    append(tensionDisplay)
-                }
-                unitTextView?.text = buildString {
-                    append(unitDisplay)
-                }
-            }
+        runOnUiThread {
+            tensionTextView?.text = buildString { append(tensionDisplay) }
+            unitTextView?.text = buildString { append(unitDisplay) }
         }
     }
 
