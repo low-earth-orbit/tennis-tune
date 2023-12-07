@@ -18,6 +18,7 @@ import ca.unb.mobiledev.tennis_tune.AddEditRacquetActivity
 import ca.unb.mobiledev.tennis_tune.R
 import ca.unb.mobiledev.tennis_tune.RacquetListActivity
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
+import java.util.Collections
 
 class RacquetAdapter(
     private val context: Context,
@@ -153,5 +154,12 @@ class RacquetAdapter(
         override fun areContentsTheSame(oldItem: Racquet, newItem: Racquet): Boolean {
             return oldItem == newItem
         }
+    }
+
+    fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        val updatedList = currentList.toMutableList() // Make a mutable copy of the current list
+        Collections.swap(updatedList, fromPosition, toPosition) // Swap items
+        submitList(updatedList) // Submit the updated list to the adapter
+        return true
     }
 }
