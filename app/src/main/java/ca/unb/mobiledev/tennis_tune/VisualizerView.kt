@@ -30,8 +30,10 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
     private var displayFrequency: Float = 0f
     private var frequencyWindow = mutableListOf<Float>()
     private val frequencyWindowSize =
-        60  // Use a rolling window of frequencies
-    private val frequencyWindowMaxStdDev = 1f
+        60  // Use a rolling window of frequencies for calculation
+    private val frequencyWindowReportSize =
+        5 // Display frequency only when this number of measurement reached
+    private val frequencyWindowMaxStdDev = 5f
 
     private var recentMagnitudesAverage = mutableListOf<Float>()
     private val maxMagnitudeAverageSize = fftSizeHalf  // For calculating background
@@ -83,7 +85,7 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
 
             // Apply a frequency range filter
             if (detectedFrequency in 420f..770f) {
-               computeDisplayFrequency(detectedFrequency)
+                computeDisplayFrequency(detectedFrequency)
             }
         }
         invalidate()  // Request a redraw
@@ -164,18 +166,20 @@ class VisualizerView(context: Context, attrs: AttributeSet? = null) : View(conte
             }
             frequencyWindow.add(frequency)
 
-            // Compute the standard deviation
-            val mean = frequencyWindow.average().toFloat()
-            val sumOfSquaredDifferences = frequencyWindow.fold(0.0) { accumulator, next ->
-                accumulator + (next - mean).pow(2)
-            }
-            val standardDeviation = sqrt(sumOfSquaredDifferences / frequencyWindow.size)
+            if (frequencyWindow.size >= frequencyWindowReportSize) {
+                // Compute the standard deviation
+                val mean = frequencyWindow.average().toFloat()
+                val sumOfSquaredDifferences = frequencyWindow.fold(0.0) { accumulator, next ->
+                    accumulator + (next - mean).pow(2)
+                }
+                val standardDeviation = sqrt(sumOfSquaredDifferences / (frequencyWindow.size - 1))
 
-            // If the standard deviation is below the threshold, it's time to notify the listener
-            if (standardDeviation <= frequencyWindowMaxStdDev) {
-                // Notify the listener
-                val meanFrequency = frequencyWindow.average().toFloat()
-                displayFrequencyListener?.onDisplayFrequencyChange(meanFrequency)
+                // If the standard deviation is below the threshold, it's time to notify the listener
+                if (standardDeviation <= frequencyWindowMaxStdDev) {
+                    // Notify the listener
+                    val meanFrequency = frequencyWindow.average().toFloat()
+                    displayFrequencyListener?.onDisplayFrequencyChange(meanFrequency)
+                }
             }
         }
     }
