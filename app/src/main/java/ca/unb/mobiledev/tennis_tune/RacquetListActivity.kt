@@ -95,7 +95,11 @@ class RacquetListActivity : AppCompatActivity() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                adapter.onItemMove(fromPosition, toPosition)
+                adapter.notifyItemMoved(fromPosition, toPosition)
+                viewModel.updateRacquetOrder(adapter.currentList)
                 return true
             }
 

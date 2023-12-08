@@ -26,6 +26,7 @@ class RacquetAdapter(
     private val onClick: (Racquet) -> Unit
 ) : ListAdapter<Racquet, RacquetAdapter.RacquetViewHolder>(RacquetDiffCallback()) {
     private var selectedRacquet: Racquet? = null
+    private var items: MutableList<Racquet> = mutableListOf()
 
     inner class RacquetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val deleteButton = itemView.findViewById<ImageView>(R.id.deleteButton)
@@ -156,10 +157,15 @@ class RacquetAdapter(
         }
     }
 
+    override fun submitList(list: List<Racquet>?) {
+        super.submitList(list)
+        items = list?.toMutableList() ?: mutableListOf()
+    }
+
     fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        val updatedList = currentList.toMutableList() // Make a mutable copy of the current list
-        Collections.swap(updatedList, fromPosition, toPosition) // Swap items
-        submitList(updatedList) // Submit the updated list to the adapter
+        Collections.swap(items, fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+        viewModel.updateRacquetOrder(items)
         return true
     }
 }

@@ -130,13 +130,16 @@ class AddEditRacquetActivity : AppCompatActivity() {
 
     private fun saveRacquet() {
         val racquetName = binding.editRacquetRacquetName.text.toString()
-        val headSize =
-            binding.editRacquetRacquetHeadSize.text.toString().toIntOrNull()
+        val headSize = binding.editRacquetRacquetHeadSize.text.toString().toDoubleOrNull()
         val stringMassDensity =
             binding.editRacquetStringMassDensity.text.toString().toDoubleOrNull()
 
+        // Determine the next order value
+        val currentMaxOrder = viewModel.getMaxOrderValue()
+        val nextOrderValue = currentMaxOrder + 1
+
         val racquet =
-            Racquet(racquetId ?: 0, racquetName, headSize!!.toDouble(), stringMassDensity!!)
+            Racquet(racquetId ?: 0, racquetName, headSize!!, stringMassDensity!!, nextOrderValue)
 
         if (racquetId == null) {
             viewModel.insert(racquet)

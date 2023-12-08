@@ -40,4 +40,11 @@ class RacquetRepository(application: Application) {
             insert(defaultRacquet)
         }
     }
+
+    suspend fun updateRacquetOrder(updatedList: List<Racquet>) {
+        updatedList.forEachIndexed { index, racquet ->
+            racquet.order = index
+            update(racquet) // Update racquet with new order
+        }
+    }
 }

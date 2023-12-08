@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import ca.unb.mobiledev.tennis_tune.entity.Racquet
 import ca.unb.mobiledev.tennis_tune.repository.RacquetRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class RacquetViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: RacquetRepository = RacquetRepository(application)
@@ -34,5 +35,15 @@ class RacquetViewModel(application: Application) : AndroidViewModel(application)
         if (allRacquets.value.orEmpty().size > 1) {
             repository.delete(racquet)
         }
+    }
+
+    fun getMaxOrderValue(): Int {
+        return runBlocking {
+            repository.getAllRacquetsSynchronously().maxOfOrNull { it.order } ?: 0
+        }
+    }
+
+    fun updateRacquetOrder(updatedList: List<Racquet>) = viewModelScope.launch {
+        repository.updateRacquetOrder(updatedList)
     }
 }

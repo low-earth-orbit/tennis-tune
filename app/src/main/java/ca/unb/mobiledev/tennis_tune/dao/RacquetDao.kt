@@ -11,10 +11,10 @@ import ca.unb.mobiledev.tennis_tune.entity.Racquet
 
 @Dao
 interface RacquetDao {
-    @Query("SELECT * FROM racquets")
+    @Query("SELECT * FROM racquets ORDER BY `order`")
     suspend fun getAllRacquetsSynchronously(): List<Racquet>
 
-    @Query("SELECT * FROM racquets")
+    @Query("SELECT * FROM racquets ORDER BY `order`")
     fun getAllRacquets(): LiveData<List<Racquet>>
 
     @Query("SELECT * FROM racquets WHERE id = :id")
